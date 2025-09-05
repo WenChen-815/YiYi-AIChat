@@ -1,15 +1,16 @@
-package com.zhoujh.aichat.model
+package com.zhoujh.aichat.app.manager
 
 import android.util.Log
-import com.zhoujh.aichat.AppContext
+import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.database.entity.AICharacter
+import com.zhoujh.aichat.database.entity.ChatMessage
+import com.zhoujh.aichat.network.model.Message
+import com.zhoujh.aichat.database.entity.MessageType
 import com.zhoujh.aichat.network.ApiService
-import com.zhoujh.aichat.ui.ChatActivity
-import com.zhoujh.aichat.utils.ConfigManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Collections
-
 
 object AIChatManager {
     private val TAG = "AIChatManager"
@@ -91,7 +92,7 @@ object AIChatManager {
                     characterId = aiCharacter.aiCharacterId,
                     chatUserId = AppContext.USER_ID
                 )
-//                // 保存AI消息到数据库 创建一个新的协程来执行挂起函数
+                // 保存AI消息到数据库 创建一个新的协程来执行挂起函数
                 CoroutineScope(Dispatchers.IO).launch {
                     chatMessageDao.insertMessage(aiMessage)
                 }

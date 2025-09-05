@@ -1,7 +1,7 @@
 package com.zhoujh.aichat.database
 
 import androidx.room.TypeConverter
-import com.zhoujh.aichat.model.MessageType
+import com.zhoujh.aichat.database.entity.MessageType
 
 class Converters {
 

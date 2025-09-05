@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.model
+package com.zhoujh.aichat.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

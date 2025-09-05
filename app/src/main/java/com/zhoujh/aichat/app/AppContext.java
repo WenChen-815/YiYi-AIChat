@@ -1,4 +1,4 @@
-package com.zhoujh.aichat;
+package com.zhoujh.aichat.app;
 
 import android.app.Application;
 import android.content.Context;

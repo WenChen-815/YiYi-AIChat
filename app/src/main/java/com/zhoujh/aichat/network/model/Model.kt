@@ -1,6 +1,6 @@
-package com.zhoujh.aichat.model
+package com.zhoujh.aichat.network.model
 
-// 模型列表响应的顶层结构
+// AI模型列表响应的顶层结构
 data class ModelsResponse(
     val `object`: String,
     val data: List<Model>,

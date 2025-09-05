@@ -1,8 +1,9 @@
-package com.zhoujh.aichat.utils
+package com.zhoujh.aichat.app.manager
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.zhoujh.aichat.AppContext
+import androidx.core.content.edit
+import com.zhoujh.aichat.app.AppContext
 
 class ConfigManager() {
     private val PREF_NAME = "ai_chat_config"
@@ -15,7 +16,7 @@ class ConfigManager() {
 
     // 保存API Key
     fun saveApiKey(apiKey: String) {
-        prefs.edit().putString(KEY_API_KEY, apiKey).apply()
+        prefs.edit { putString(KEY_API_KEY, apiKey) }
     }
 
     // 获取API Key
@@ -25,7 +26,7 @@ class ConfigManager() {
 
     // 保存中转地址
     fun saveBaseUrl(baseUrl: String) {
-        prefs.edit().putString(KEY_BASE_URL, baseUrl).apply()
+        prefs.edit { putString(KEY_BASE_URL, baseUrl) }
     }
 
     // 获取中转地址
@@ -35,7 +36,7 @@ class ConfigManager() {
 
     // 保存选中的模型
     fun saveSelectedModel(modelId: String) {
-        prefs.edit().putString(KEY_SELECTED_MODEL, modelId).apply()
+        prefs.edit { putString(KEY_SELECTED_MODEL, modelId) }
     }
 
     // 获取选中的模型
@@ -52,7 +53,7 @@ class ConfigManager() {
 
     // 选中的角色相关
     fun saveSelectedCharacterId(characterId: String) {
-        prefs.edit().putString("selected_character_id", characterId).apply()
+        prefs.edit { putString("selected_character_id", characterId) }
     }
 
     fun getSelectedCharacterId(): String? {
@@ -61,11 +62,11 @@ class ConfigManager() {
 
     // 清除选中的角色
     fun clearSelectedCharacter() {
-        prefs.edit().remove("selected_character_id").apply()
+        prefs.edit { remove("selected_character_id") }
     }
 
     // 清除所有配置
     fun clearAllConfig() {
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
     }
 }

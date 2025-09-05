@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.model
+package com.zhoujh.aichat.network.model
 
 // 聊天响应的数据模型
 data class ChatResponse(

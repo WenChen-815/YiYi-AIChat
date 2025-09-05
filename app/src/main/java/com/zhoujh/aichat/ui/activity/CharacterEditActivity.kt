@@ -1,13 +1,14 @@
-package com.zhoujh.aichat.ui
+package com.zhoujh.aichat.ui.activity
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.zhoujh.aichat.AppContext
-import com.zhoujh.aichat.database.AICharacterDao
+import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.database.dao.AICharacterDao
 import com.zhoujh.aichat.databinding.ActivityCharacterEditBinding
-import com.zhoujh.aichat.model.AICharacter
+import com.zhoujh.aichat.database.entity.AICharacter
+import com.zhoujh.aichat.ui.viewmodel.CharacterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
-class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope(){
+class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     private lateinit var binding: ActivityCharacterEditBinding
     private lateinit var viewModel: CharacterViewModel
     private var characterId: String? = null
@@ -101,22 +102,26 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
         if (characterId == null) {
             launch(Dispatchers.IO) {
                 var result = aiCharacterDao.insertAICharacter(character)
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     if (result > 0) {
-                        Toast.makeText(this@CharacterEditActivity, "添加成功", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CharacterEditActivity, "添加成功", Toast.LENGTH_SHORT)
+                            .show()
                     } else {
-                        Toast.makeText(this@CharacterEditActivity, "添加失败", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CharacterEditActivity, "添加失败", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }
         } else {
             launch(Dispatchers.IO) {
                 var result = aiCharacterDao.updateAICharacter(character)
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
                     if (result > 0) {
-                        Toast.makeText(this@CharacterEditActivity, "更新成功", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CharacterEditActivity, "更新成功", Toast.LENGTH_SHORT)
+                            .show()
                     } else {
-                        Toast.makeText(this@CharacterEditActivity, "更新失败", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CharacterEditActivity, "更新失败", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }

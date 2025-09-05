@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".AppContext"
+        android:name=".app.AppContext"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,7 +16,7 @@
         android:theme="@style/Theme.AIChat"
         tools:targetApi="31">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan|stateHidden"
@@ -28,13 +28,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ConfigActivity"
+            android:name=".ui.activity.ConfigActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.CharacterEditActivity"
+            android:name=".ui.activity.CharacterEditActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ChatActivity"
+            android:name=".ui.activity.ChatActivity"
             android:exported="false" />
     </application>
 

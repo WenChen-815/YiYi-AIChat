@@ -1,11 +1,11 @@
 package com.zhoujh.aichat.network
 
 import android.util.Log
-import com.zhoujh.aichat.model.ChatResponse
-import com.zhoujh.aichat.model.ModelsResponse
+import com.zhoujh.aichat.network.model.ChatResponse
+import com.zhoujh.aichat.network.model.ModelsResponse
 import com.google.gson.Gson
-import com.zhoujh.aichat.model.Message
-import com.zhoujh.aichat.model.Model
+import com.zhoujh.aichat.network.model.Message
+import com.zhoujh.aichat.network.model.Model
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

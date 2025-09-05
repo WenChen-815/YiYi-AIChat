@@ -1,8 +1,8 @@
-package com.zhoujh.aichat.repository
+package com.zhoujh.aichat.database.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.zhoujh.aichat.AppContext
+import com.zhoujh.aichat.app.AppContext
 
 
 class AICharacterRepository {

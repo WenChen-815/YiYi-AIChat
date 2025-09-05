@@ -1,11 +1,11 @@
-package com.zhoujh.aichat.ui
+package com.zhoujh.aichat.ui.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagingData
-import com.zhoujh.aichat.model.AICharacter
-import com.zhoujh.aichat.repository.AICharacterRepository
+import com.zhoujh.aichat.database.entity.AICharacter
+import com.zhoujh.aichat.database.repository.AICharacterRepository
 import kotlinx.coroutines.flow.Flow
 
 class CharacterViewModel : ViewModel() {

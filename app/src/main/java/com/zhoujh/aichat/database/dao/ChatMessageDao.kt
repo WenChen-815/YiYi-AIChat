@@ -1,11 +1,9 @@
-package com.zhoujh.aichat.database
+package com.zhoujh.aichat.database.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.zhoujh.aichat.model.ChatMessage
-import kotlinx.coroutines.flow.Flow
+import com.zhoujh.aichat.database.entity.ChatMessage
 
 @Dao
 interface ChatMessageDao {

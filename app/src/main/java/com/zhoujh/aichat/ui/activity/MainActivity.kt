@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.ui
+package com.zhoujh.aichat.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.zhoujh.aichat.databinding.ActivityMainBinding
-import com.zhoujh.aichat.model.AIChatManager
+import com.zhoujh.aichat.app.manager.AIChatManager
 import com.zhoujh.aichat.ui.fragment.HomeFragment
 import com.zhoujh.aichat.utils.StatusBarUtil
 import kotlinx.coroutines.CoroutineScope

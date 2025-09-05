@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.ui
+package com.zhoujh.aichat.ui.activity
 
 import android.content.Intent
 import android.graphics.Rect
@@ -24,18 +24,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
-import com.zhoujh.aichat.AppContext
+import com.zhoujh.aichat.app.AppContext
 import com.zhoujh.aichat.R
-import com.zhoujh.aichat.adapter.ChatAdapter
-import com.zhoujh.aichat.database.ChatMessageDao
+import com.zhoujh.aichat.ui.adapter.ChatAdapter
+import com.zhoujh.aichat.database.dao.ChatMessageDao
 import com.zhoujh.aichat.databinding.ActivityChatBinding
-import com.zhoujh.aichat.model.AICharacter
-import com.zhoujh.aichat.model.AIChatManager
-import com.zhoujh.aichat.model.AIChatMessageListener
-import com.zhoujh.aichat.model.ChatMessage
-import com.zhoujh.aichat.model.Model
+import com.zhoujh.aichat.database.entity.AICharacter
+import com.zhoujh.aichat.app.manager.AIChatManager
+import com.zhoujh.aichat.app.manager.AIChatMessageListener
+import com.zhoujh.aichat.database.entity.ChatMessage
+import com.zhoujh.aichat.network.model.Model
 import com.zhoujh.aichat.network.ApiService
-import com.zhoujh.aichat.utils.ConfigManager
+import com.zhoujh.aichat.app.manager.ConfigManager
 import com.zhoujh.aichat.utils.limitMutableListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

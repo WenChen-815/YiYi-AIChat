@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.adapter
+package com.zhoujh.aichat.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zhoujh.aichat.databinding.ItemAiMessageBinding
 import com.zhoujh.aichat.databinding.ItemUserMessageBinding
-import com.zhoujh.aichat.model.ChatMessage
-import com.zhoujh.aichat.model.MessageType
+import com.zhoujh.aichat.database.entity.ChatMessage
+import com.zhoujh.aichat.database.entity.MessageType
 
 class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessageDiffCallback()) {
 

@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.adapter
+package com.zhoujh.aichat.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +9,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.zhoujh.aichat.R
-import com.zhoujh.aichat.model.AICharacter
+import com.zhoujh.aichat.database.entity.AICharacter
 import java.text.SimpleDateFormat
 import java.util.Locale
 

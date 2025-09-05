@@ -1,4 +1,4 @@
-package com.zhoujh.aichat.ui
+package com.zhoujh.aichat.ui.activity
 
 import android.R
 import android.content.Intent
@@ -12,9 +12,9 @@ import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.zhoujh.aichat.databinding.ActivityConfigBinding
-import com.zhoujh.aichat.model.Model
+import com.zhoujh.aichat.network.model.Model
 import com.zhoujh.aichat.network.ApiService
-import com.zhoujh.aichat.utils.ConfigManager
+import com.zhoujh.aichat.app.manager.ConfigManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 

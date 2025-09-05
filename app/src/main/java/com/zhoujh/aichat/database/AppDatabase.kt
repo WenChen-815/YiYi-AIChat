@@ -5,8 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.zhoujh.aichat.model.AICharacter
-import com.zhoujh.aichat.model.ChatMessage
+import com.zhoujh.aichat.database.dao.AICharacterDao
+import com.zhoujh.aichat.database.dao.ChatMessageDao
+import com.zhoujh.aichat.database.entity.AICharacter
+import com.zhoujh.aichat.database.entity.ChatMessage
 
 @Database(
     entities = [AICharacter::class, ChatMessage::class],
