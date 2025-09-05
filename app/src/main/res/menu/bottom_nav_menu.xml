@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:title="首页"
+        android:icon="@null"/>
+
+    <item
+        android:id="@+id/navigation_search"
+        android:title="搜索"
+        android:icon="@null"/>
+
+    <!-- 占位项，用于中间按钮的位置 -->
+    <item
+        android:id="@+id/navigation_placeholder"
+        android:enabled="false"
+        android:title="" />
+
+    <item
+        android:id="@+id/navigation_message"
+        android:title="消息"
+        android:icon="@null"/>
+
+    <item
+        android:id="@+id/navigation_profile"
+        android:title="我的"
+        android:icon="@null"/>
+
+</menu>
