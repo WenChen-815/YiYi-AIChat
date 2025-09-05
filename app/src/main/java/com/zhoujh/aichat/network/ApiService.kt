@@ -39,7 +39,6 @@ class ApiService(private val baseUrl: String, private val apiKey: String) {
         // 使用Gson将请求体对象转换为JSON字符串
         val requestBodyStr = gson.toJson(chatRequest)
         val requestBody = requestBodyStr.toRequestBody(jsonMediaType)
-        Log.d(tag, "requestBody: $requestBodyStr")
 
         // 构建请求
         val request = Request.Builder()

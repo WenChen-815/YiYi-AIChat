@@ -36,6 +36,7 @@ import com.zhoujh.aichat.database.entity.ChatMessage
 import com.zhoujh.aichat.network.model.Model
 import com.zhoujh.aichat.network.ApiService
 import com.zhoujh.aichat.app.manager.ConfigManager
+import com.zhoujh.aichat.database.entity.MessageType
 import com.zhoujh.aichat.utils.limitMutableListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -374,16 +375,17 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         var characterId = configManager.getSelectedCharacterId() ?: ""
         if (characterId.isNotEmpty()) {
             launch(Dispatchers.IO) {
-                AppContext.appDatabase.aiCharacterDao().getCharacterById(characterId)?.let { character ->
-                    currentAICharacter = character
-                    currentCharacterId = character.aiCharacterId
-                    currentCharacterName = character.name
-                    mainHandler.post {
-                        updateCharacterDisplay()
-                        // 加载聊天记录
-                        loadInitialData()
+                AppContext.appDatabase.aiCharacterDao().getCharacterById(characterId)
+                    ?.let { character ->
+                        currentAICharacter = character
+                        currentCharacterId = character.aiCharacterId
+                        currentCharacterName = character.name
+                        mainHandler.post {
+                            updateCharacterDisplay()
+                            // 加载聊天记录
+                            loadInitialData()
+                        }
                     }
-                }
             }
         } else {
             // 如果没有选中的角色，可能需要跳转到角色选择页面

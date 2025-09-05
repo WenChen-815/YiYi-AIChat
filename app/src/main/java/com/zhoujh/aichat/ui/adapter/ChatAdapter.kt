@@ -1,7 +1,9 @@
 package com.zhoujh.aichat.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.util.LogWriter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -9,6 +11,7 @@ import com.zhoujh.aichat.databinding.ItemAiMessageBinding
 import com.zhoujh.aichat.databinding.ItemUserMessageBinding
 import com.zhoujh.aichat.database.entity.ChatMessage
 import com.zhoujh.aichat.database.entity.MessageType
+import com.zhoujh.aichat.utils.ChatUtil
 
 class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessageDiffCallback()) {
 
@@ -91,9 +94,11 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
         val processedMessagesTemp = mutableListOf<ChatMessage>()
 
         for (message in messages) {
-            if (message.type == MessageType.AI && message.content.contains('\\')) {
+            // 解析AI回复中的日期和角色名称
+            var cleanedContent = ChatUtil.parseMessage(message)
+            if (message.type == MessageType.AI && cleanedContent.contains('\\')) {
                 // 分割AI消息内容
-                val parts = message.content.split('\\').filter { it.isNotBlank() }
+                val parts = cleanedContent.split('\\').filter { it.isNotBlank() }
 
                 // 为每个部分创建一个新的ChatMessage对象
                 for (i in parts.indices) {
@@ -113,7 +118,14 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
                 }
             } else {
                 // 非AI消息或不包含\的AI消息直接添加
-                processedMessagesTemp.add(message)
+                processedMessagesTemp.add(ChatMessage(
+                    id = message.id,
+                    content = cleanedContent,
+                    type = message.type,
+                    timestamp = message.timestamp,
+                    characterId = message.characterId,
+                    chatUserId = message.chatUserId
+                ))
             }
         }
         // 存储处理后的消息
