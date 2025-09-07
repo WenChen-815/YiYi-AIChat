@@ -28,10 +28,20 @@ fun <T> limitMutableListOf(limit: Int, vararg elements: T): LimitMutableList<T> 
  * 当添加新元素导致超过限制时，会自动移除最旧的元素
  * @param limit 最大存储元素数量
  */
-class LimitMutableList<T>(private val limit: Int) : MutableList<T> {
+class LimitMutableList<T>(private var limit: Int) : MutableList<T> {
     private val list = mutableListOf<T>()
     override val size: Int
         get() = list.size
+    fun setLimit(limit: Int) {
+        this.limit = limit
+        // 当限制大小减少时，移除超出限制的元素
+        while (list.size > limit) {
+            list.removeAt(0)
+        }
+    }
+    fun getLimit(): Int {
+        return limit
+    }
 
     override fun contains(element: T): Boolean = list.contains(element)
 

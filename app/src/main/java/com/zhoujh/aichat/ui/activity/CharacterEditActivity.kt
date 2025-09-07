@@ -8,6 +8,7 @@ import com.zhoujh.aichat.app.AppContext
 import com.zhoujh.aichat.database.dao.AICharacterDao
 import com.zhoujh.aichat.databinding.ActivityCharacterEditBinding
 import com.zhoujh.aichat.database.entity.AICharacter
+import com.zhoujh.aichat.database.entity.AIChatMemory
 import com.zhoujh.aichat.ui.viewmodel.CharacterViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,15 +21,14 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
     private lateinit var binding: ActivityCharacterEditBinding
     private lateinit var viewModel: CharacterViewModel
     private var characterId: String? = null
-    private lateinit var aiCharacterDao: AICharacterDao
+    private var aiCharacterDao = AppContext.appDatabase.aiCharacterDao()
+    private var aiChatMemoryDao = AppContext.appDatabase.aiChatMemoryDao()
     private val userId = AppContext.USER_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCharacterEditBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        aiCharacterDao = AppContext.appDatabase.aiCharacterDao()
 
         // 初始化ViewModel
         viewModel = ViewModelProvider(this)[CharacterViewModel::class.java]
@@ -66,9 +66,11 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
     private fun loadCharacterData(characterId: String) {
         launch(Dispatchers.IO){
             var character = aiCharacterDao.getCharacterById(characterId)
+            var memory = aiChatMemoryDao.getByCharacterId(characterId)
             withContext(Dispatchers.Main) {
                 binding.etCharacterName.setText(character?.name)
                 binding.etPrompt.setText(character?.prompt)
+                binding.etMemory.setText(memory?.content)
                 // 如果有头像或背景图，可以在这里设置预览
             }
         }
@@ -78,6 +80,7 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
     private fun saveCharacter() {
         val name = binding.etCharacterName.text.toString().trim()
         val prompt = binding.etPrompt.text.toString().trim()
+        var memory = binding.etMemory.text.toString().trim()
 
         if (name.isEmpty()) {
             binding.etCharacterName.error = "请输入角色名称"
@@ -89,6 +92,10 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
             return
         }
 
+        if (memory.isEmpty()) {
+            memory = ""
+        }
+
         val character = AICharacter(
             aiCharacterId = characterId ?: UUID.randomUUID().toString(),
             name = name,
@@ -97,6 +104,12 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
             createdAt = System.currentTimeMillis(),
             avatarPath = null, // 实际应用中可以设置为选择的图片路径
             backgroundPath = null // 实际应用中可以设置为选择的图片路径
+        )
+
+        val memoryEntity = AIChatMemory(
+            characterId = character.aiCharacterId,
+            content = memory,
+            createdAt = System.currentTimeMillis()
         )
 
         if (characterId == null) {
@@ -115,8 +128,9 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
         } else {
             launch(Dispatchers.IO) {
                 var result = aiCharacterDao.updateAICharacter(character)
+                var result2 = aiChatMemoryDao.update(memoryEntity)
                 withContext(Dispatchers.Main) {
-                    if (result > 0) {
+                    if (result > 0 && result2 > 0) {
                         Toast.makeText(this@CharacterEditActivity, "更新成功", Toast.LENGTH_SHORT)
                             .show()
                     } else {

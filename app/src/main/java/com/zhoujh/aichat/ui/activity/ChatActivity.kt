@@ -36,7 +36,8 @@ import com.zhoujh.aichat.database.entity.ChatMessage
 import com.zhoujh.aichat.network.model.Model
 import com.zhoujh.aichat.network.ApiService
 import com.zhoujh.aichat.app.manager.ConfigManager
-import com.zhoujh.aichat.database.entity.MessageType
+import com.zhoujh.aichat.database.entity.TempChatMessage
+import com.zhoujh.aichat.utils.LimitMutableList
 import com.zhoujh.aichat.utils.limitMutableListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +50,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
 
     // 常量定义
     private val TAG = "ChatActivity"
-    private var MAX_CONTEXT_MESSAGE_SIZE = 10
+    private var MAX_CONTEXT_MESSAGE_SIZE = 5
 
     // 布局与视图相关变量
     private lateinit var binding: ActivityChatBinding
@@ -62,7 +63,9 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     // 适配器与数据列表相关变量
     private lateinit var chatAdapter: ChatAdapter
     private val chatMessages = mutableListOf<ChatMessage>()
-    private var chatContext = limitMutableListOf<ChatMessage>(MAX_CONTEXT_MESSAGE_SIZE)
+    private var chatContext: LimitMutableList<TempChatMessage> =
+        limitMutableListOf<TempChatMessage>(MAX_CONTEXT_MESSAGE_SIZE)
+//    private var chatContext = mutableListOf<ChatMessage>()
 
     // 配置与服务相关变量
     private lateinit var configManager: ConfigManager
@@ -74,7 +77,8 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     private lateinit var aIChatMessageListener: AIChatMessageListener
 
     // 数据库相关变量
-    private lateinit var chatMessageDao: ChatMessageDao
+    private val chatMessageDao = AppContext.appDatabase.chatMessageDao()
+    private val tempChatMessageDao = AppContext.appDatabase.tempChatMessageDao()
 
     // 协程与任务相关变量
     private var currentFlowJob: Job? = null
@@ -112,9 +116,6 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             return
         }
 
-        // 初始化数据库DAO
-        chatMessageDao = AppContext.appDatabase.chatMessageDao()
-
         // 初始化API服务
         initApiService()
         // 初始化聊天适配器
@@ -131,7 +132,9 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     override fun onDestroy() {
         super.onDestroy()
         currentFlowJob?.cancel()
-        AIChatManager.unregisterListener(aIChatMessageListener)
+        if (::aIChatMessageListener.isInitialized) {
+            AIChatManager.unregisterListener(aIChatMessageListener)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -139,16 +142,25 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         if (requestCode == CHARACTER_SELECT_REQUEST && resultCode == RESULT_OK) {
             val characterId = data?.getStringExtra("SELECTED_CHARACTER_ID")
             if (characterId != null) {
-                // 从数据库加载角色信息
-                currentAICharacter =
-                    AppContext.appDatabase.aiCharacterDao().getCharacterById(characterId)!!
-                currentCharacterId = characterId
-                currentCharacterName = currentAICharacter!!.name
-                updateCharacterDisplay()
-                Toast.makeText(this, "已选择角色：${currentCharacterName}", Toast.LENGTH_SHORT)
-                    .show()
-                // 加载聊天记录
-                loadInitialData()
+                launch(Dispatchers.IO) {
+                    // 从数据库加载角色信息
+                    currentAICharacter =
+                        AppContext.appDatabase.aiCharacterDao().getCharacterById(characterId)!!
+                    currentCharacterId = characterId
+                    currentCharacterName = currentAICharacter.name
+                    mainHandler.post {
+                        updateCharacterDisplay()
+                        Toast.makeText(
+                            this@ChatActivity,
+                            "已选择角色：${currentCharacterName}",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        // 加载聊天记录
+                        loadInitialData()
+                    }
+                }
+
             }
         }
     }
@@ -208,7 +220,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                 binding.etMessage.text.clear()
                 // 显示加载状态
                 binding.progressBar.visibility = View.VISIBLE
-                binding.btnSend.isEnabled = false
+//                binding.btnSend.isEnabled = false
                 if (userMessage.characterId == currentAICharacter?.aiCharacterId) {
                     handleNewMessage(userMessage)
                 }
@@ -219,7 +231,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                 Log.d(TAG, "onMessageReceived: $aiMessage")
                 // 隐藏加载状态
                 binding.progressBar.visibility = View.GONE
-                binding.btnSend.isEnabled = true
+//                binding.btnSend.isEnabled = true
                 if (aiMessage.characterId == currentAICharacter?.aiCharacterId) {
                     handleNewMessage(aiMessage)
                 }
@@ -317,7 +329,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         }
         // 发送消息到AI
         launch {
-            AIChatManager.send(
+            AIChatManager.sendMessage(
                 currentAICharacter,
                 messageText,
                 tempChatContext
@@ -399,34 +411,45 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     private fun loadInitialData() {
         lifecycleScope.launch {
             val initialMessages = chatMessageDao.getMessagesByPage(
-                currentAICharacter?.aiCharacterId.toString(),
+                currentAICharacter.aiCharacterId.toString(),
                 PAGE_SIZE,
                 0
             )
-            Log.d(
-                "loadInitialData",
-                "initialMessages[ ${initialMessages.map { it -> it.content }}]"
-            )
-            chatContext.clear()
-            var count = 0
-            initialMessages.forEach { message ->
-                if (count < MAX_CONTEXT_MESSAGE_SIZE) {
-                    chatContext.add(0, message)
-                    count++
-                }
-            }
+//            Log.d(
+//                "loadInitialData",
+//                "initialMessages[ ${initialMessages.map { it -> it.content }}]"
+//            )
+//            chatContext.clear()
+//            var count = 0
+//            initialMessages.forEach { message ->
+//                if (count < MAX_CONTEXT_MESSAGE_SIZE) {
+//                    chatContext.add(0, message)
+//                    count++
+//                }
+//            }
             // 将初始数据存入 chatMessages
             chatMessages.clear()
             val reversedMessages = initialMessages.reversed()
             chatMessages.addAll(reversedMessages) // 反转降序数据为升序
-            chatAdapter.setMessages(reversedMessages)
+            chatAdapter.setMessages(reversedMessages) {
+                // 滚动到底部
+                binding.rvChat.scrollToPosition(chatAdapter.itemCount - 1)
+            }
             currentPage = 1
             // 检查是否还有更多数据
             val totalCount = chatMessageDao.getTotalMessageCount()
             hasMoreData = totalCount > PAGE_SIZE
-
-            // 滚动到底部
-            binding.rvChat.scrollToPosition(chatAdapter.itemCount - 1)
+//            Log.d(
+//                "loadInitialData",
+//                "initialMessages[ ${chatMessages.map { it -> it.content }}]"
+//            )
+            tempChatMessageDao.getByCharacterId(currentCharacterId).takeLast(MAX_CONTEXT_MESSAGE_SIZE).let {
+                chatContext.addAll(it)
+            }
+            Log.d(
+                "loadInitialData",
+                "chatContext[ ${chatContext.map { it -> it.content }}]"
+            )
         }
     }
 
@@ -439,7 +462,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
 
             val offset = currentPage * PAGE_SIZE
             val moreMessages = chatMessageDao.getMessagesByPage(
-                currentAICharacter?.aiCharacterId.toString(),
+                currentAICharacter.aiCharacterId.toString(),
                 PAGE_SIZE,
                 offset
             )
@@ -465,13 +488,13 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     private fun loadChatHistory() {
         // 首先取消现有的Flow订阅
         currentFlowJob?.cancel()
-        currentAICharacter?.aiCharacterId?.let { characterId ->
+        currentAICharacter.aiCharacterId?.let { characterId ->
             // 关键修复：将新的订阅保存到currentFlowJob变量中
             currentFlowJob = launch(Dispatchers.IO) {
                 chatMessageDao.getMessagesByCharacterId(characterId).let { messages ->
                     mainHandler.post {
                         // 确保只处理当前角色的消息
-                        val currentCharacterId = currentAICharacter?.aiCharacterId
+                        val currentCharacterId = currentAICharacter.aiCharacterId
                         if (currentCharacterId == characterId) {
                             chatMessages.clear()
                             chatMessages.addAll(messages)
@@ -503,8 +526,15 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         // 添加新的消息到列表中
         chatMessages.add(message)
         // 添加到聊天上下文中
-        chatContext.add(message)
-        Log.d("chatContext", "chatContext[ ${chatContext.map { it -> it.content }}]")
+        val tempMessage = TempChatMessage(
+            id = message.id,
+            content = message.content,
+            type = message.type,
+            characterId = message.characterId,
+            chatUserId = message.chatUserId
+        )
+        chatContext.add(tempMessage)
+//        Log.d("chatContext", "chatContext[ ${chatContext.map { it -> it.content }}]")
         // 提交列表数据到适配器中
         chatAdapter.setMessages(chatMessages) {
             // 滚动到列表底部
@@ -515,7 +545,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     // UI交互相关方法
     // 更新角色显示
     private fun updateCharacterDisplay() {
-        binding.tvCurrentCharacter.text = currentAICharacter?.name
+        binding.tvCurrentCharacter.text = currentAICharacter.name
     }
 
     // 展示模型列表对话框
@@ -555,9 +585,10 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             .setTitle("确认清空")
             .setMessage("确定要清空当前角色的所有聊天记录吗？")
             .setPositiveButton("确定") { _, _ ->
-                currentAICharacter?.aiCharacterId?.let {
+                currentAICharacter.aiCharacterId.let {
                     launch(Dispatchers.IO) {
                         chatMessageDao.deleteMessagesByCharacterId(it)
+                        tempChatMessageDao.deleteByCharacterId(it)
                         mainHandler.post {
                             chatMessages.clear()
                             chatAdapter.setMessages(emptyList())

@@ -39,7 +39,7 @@ class ApiService(private val baseUrl: String, private val apiKey: String) {
         // 使用Gson将请求体对象转换为JSON字符串
         val requestBodyStr = gson.toJson(chatRequest)
         val requestBody = requestBodyStr.toRequestBody(jsonMediaType)
-
+        Log.d(tag, requestBodyStr)
         // 构建请求
         val request = Request.Builder()
             .url("$baseUrl/v1/chat/completions")
@@ -119,5 +119,13 @@ class ApiService(private val baseUrl: String, private val apiKey: String) {
     data class ChatRequest(
         val model: String,
         val messages: List<Message>
-    )
+    ) {
+        override fun toString(): String {
+            return "ChatRequest(model='$model', messagesCount=${messages.size}, messages=\n${
+                messages.joinToString(
+                    ", \n"
+                ) { "[role=${it.role}, content=${it.content?.take(50)}${if ((it.content?.length ?: 0) > 50) "..." else ""}]" }
+            })"
+        }
+    }
 }

@@ -11,5 +11,5 @@ data class AICharacter(
     val userId: String,
     val createdAt: Long,
     val avatarPath: String?,
-    val backgroundPath: String?
+    val backgroundPath: String?,
 )
