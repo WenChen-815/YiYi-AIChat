@@ -32,6 +32,8 @@ object AIChatManager {
     private lateinit var apiService: ApiService
     // 添加一个 ConcurrentHashMap 来跟踪每个 aiCharacter 的总结操作状态
     private val summarizingInProgress = ConcurrentHashMap<String, Boolean>()
+    private var USER_ID = "123123";
+    private var USER_NAME = "USER_NAME";
 
     fun init() {
         configManager = ConfigManager()
@@ -39,6 +41,8 @@ object AIChatManager {
         baseUrl = configManager.getBaseUrl() ?: ""
         selectedModel = configManager.getSelectedModel() ?: ""
         apiService = ApiService(baseUrl, apiKey)
+        USER_ID = configManager.getUserId().toString()
+        USER_NAME = configManager.getUserName().toString()
     }
 
     // 注册监听器
@@ -64,14 +68,14 @@ object AIChatManager {
         }
         val currentDate =
             SimpleDateFormat("yyyy-MM-dd EEEE HH:mm:ss", Locale.getDefault()).format(Date())
-        val currentUserName = "[${AppContext.USER_NAME}]"
+        val currentUserName = "[${USER_NAME}]"
         var newContent = "${currentDate}|${currentUserName}$newMessage"
         val userMessage = ChatMessage(
             id = "${aiCharacter.aiCharacterId}:${System.currentTimeMillis()}",
             content = newContent,
             type = MessageType.USER,
             characterId = aiCharacter.aiCharacterId,
-            chatUserId = AppContext.USER_ID
+            chatUserId = USER_ID
         )
 
         // 构建消息列表
@@ -109,7 +113,7 @@ object AIChatManager {
                 content = newContent,
                 type = MessageType.USER,
                 characterId = aiCharacter.aiCharacterId,
-                chatUserId = AppContext.USER_ID
+                chatUserId = USER_ID
             )
         )
         // 通知所有监听器消息已发送
@@ -122,71 +126,14 @@ object AIChatManager {
         send(aiCharacter, messages)
     }
 
-    suspend fun send(
+    private fun send(
         aiCharacter: AICharacter?,
-//        newMessage: String,
-//        oldMessages: List<TempChatMessage>
         messages: MutableList<Message>
     ) {
         if (aiCharacter == null) {
             Log.e(TAG, "未选择AI角色")
             return
         }
-//        val currentDate =
-//            SimpleDateFormat("yyyy-MM-dd EEEE HH:mm:ss", Locale.getDefault()).format(Date())
-//        val currentUserName = "[${AppContext.USER_NAME}]"
-//        var newContent = "${currentDate}|${currentUserName}$newMessage"
-//        val userMessage = ChatMessage(
-//            id = "${aiCharacter.aiCharacterId}:${System.currentTimeMillis()}",
-//            content = newContent,
-//            type = MessageType.USER,
-//            characterId = aiCharacter.aiCharacterId,
-//            chatUserId = AppContext.USER_ID
-//        )
-//
-//        // 构建消息列表
-//        val messages = mutableListOf<Message>()
-//
-//        // 添加系统提示消息
-//        val prompt = aiCharacter.prompt
-//        if (prompt.isNotEmpty()) {
-//            messages.add(Message("system", prompt))
-//        }
-//        // 添加历史消息
-//        for (message in oldMessages) {
-//            when (message.type) {
-//                MessageType.SYSTEM -> {
-//                    messages.add(Message("system", message.content))
-//                }
-//
-//                MessageType.USER -> {
-//                    messages.add(Message("user", message.content))
-//                }
-//
-//                MessageType.AI -> {
-//                    messages.add(Message("assistant", ChatUtil.parseMessage(message)))
-//                }
-//            }
-//        }
-//        // 添加新消息
-//        messages.add(Message("user", newContent))
-//        // 保存用户消息到数据库
-//        chatMessageDao.insertMessage(userMessage)
-//        tempChatMessageDao.insert(
-//            TempChatMessage(
-//                id = "${aiCharacter.aiCharacterId}:${System.currentTimeMillis()}",
-//                content = newContent,
-//                type = MessageType.USER,
-//                characterId = aiCharacter.aiCharacterId,
-//                chatUserId = AppContext.USER_ID
-//            )
-//        )
-//        // 通知所有监听器消息已发送
-//        CoroutineScope(Dispatchers.Main).launch {
-//            // 通知所有监听器消息已接收
-//            listeners.forEach { it.onMessageSent(userMessage) }
-//        }
-//        Log.d(TAG,"历史消息:\n${messages.map { it.content }.joinToString("\n")}")
         // 这里调用网络API发送消息
         apiService.sendMessage(
             messages = messages,
@@ -203,7 +150,7 @@ object AIChatManager {
                     content = "$currentDate|${currentCharacterName}$aiResponse",
                     type = MessageType.AI,
                     characterId = aiCharacter.aiCharacterId,
-                    chatUserId = AppContext.USER_ID
+                    chatUserId = USER_ID
                 )
                 // 保存AI消息到数据库 创建一个新的协程来执行挂起函数
                 CoroutineScope(Dispatchers.IO).launch {
@@ -214,7 +161,7 @@ object AIChatManager {
                             content = "$currentDate|${currentCharacterName}$aiResponse",
                             type = MessageType.AI,
                             characterId = aiCharacter.aiCharacterId,
-                            chatUserId = AppContext.USER_ID
+                            chatUserId = USER_ID
                         )
                     )
                     Log.i(TAG,"AI调用总结")
@@ -273,7 +220,7 @@ object AIChatManager {
                 ====角色设定====
                 $prompt
                 ====角色设定结束====
-                现在请你代入${aiCharacter.name}的角色并以“我”自称，用中文总结与${AppContext.USER_NAME}的对话，结合代入角色的性格特点，将以下对话片段提取重要信息总结为一段话作为记忆片段(直接回复一段话):
+                现在请你代入${aiCharacter.name}的角色并以“我”自称，用中文总结与${USER_NAME}的对话，结合代入角色的性格特点，将以下对话片段提取重要信息总结为一段话作为记忆片段(直接回复一段话):
             """.trimIndent()
         // 添加历史消息
         for (message in summaryMessages) {
@@ -313,7 +260,6 @@ object AIChatManager {
             onError = {
                 // 发生错误，也需要清除标记
                 summarizingInProgress.remove(characterId)
-                // 发生错误
                 Log.e(TAG, "summarize: 总结失败")
             }
         )

@@ -27,7 +27,6 @@ import com.google.gson.Gson
 import com.zhoujh.aichat.app.AppContext
 import com.zhoujh.aichat.R
 import com.zhoujh.aichat.ui.adapter.ChatAdapter
-import com.zhoujh.aichat.database.dao.ChatMessageDao
 import com.zhoujh.aichat.databinding.ActivityChatBinding
 import com.zhoujh.aichat.database.entity.AICharacter
 import com.zhoujh.aichat.app.manager.AIChatManager
@@ -415,18 +414,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                 PAGE_SIZE,
                 0
             )
-//            Log.d(
-//                "loadInitialData",
-//                "initialMessages[ ${initialMessages.map { it -> it.content }}]"
-//            )
-//            chatContext.clear()
-//            var count = 0
-//            initialMessages.forEach { message ->
-//                if (count < MAX_CONTEXT_MESSAGE_SIZE) {
-//                    chatContext.add(0, message)
-//                    count++
-//                }
-//            }
+//            Log.d("loadInitialData","initialMessages[ ${initialMessages.map { it -> it.content }}]")
             // 将初始数据存入 chatMessages
             chatMessages.clear()
             val reversedMessages = initialMessages.reversed()
@@ -439,10 +427,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             // 检查是否还有更多数据
             val totalCount = chatMessageDao.getTotalMessageCount()
             hasMoreData = totalCount > PAGE_SIZE
-//            Log.d(
-//                "loadInitialData",
-//                "initialMessages[ ${chatMessages.map { it -> it.content }}]"
-//            )
+//            Log.d("loadInitialData","initialMessages[ ${chatMessages.map { it -> it.content }}]")
             tempChatMessageDao.getByCharacterId(currentCharacterId).takeLast(MAX_CONTEXT_MESSAGE_SIZE).let {
                 chatContext.addAll(it)
             }

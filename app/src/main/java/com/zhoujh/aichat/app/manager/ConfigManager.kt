@@ -44,11 +44,33 @@ class ConfigManager() {
         return prefs.getString(KEY_SELECTED_MODEL, null)
     }
 
+    // 保存用户名
+    fun saveUserName(userName: String) {
+        prefs.edit { putString("user_name", userName) }
+    }
+
+    // 获取用户名
+    fun getUserName(): String? {
+        return prefs.getString("user_name", null)
+    }
+
+    // 保存用户ID
+    fun saveUserId(userId: String) {
+        prefs.edit { putString("user_id", userId) }
+    }
+
+    // 获取用户ID
+    fun getUserId(): String? {
+        return prefs.getString("user_id", null)
+    }
+
     // 检查是否有完整的配置
     fun hasCompleteConfig(): Boolean {
         return !getApiKey().isNullOrEmpty() &&
                 !getBaseUrl().isNullOrEmpty() &&
-                !getSelectedModel().isNullOrEmpty()
+                !getSelectedModel().isNullOrEmpty() &&
+                !getUserName().isNullOrEmpty() &&
+                !getUserId().isNullOrEmpty()
     }
 
     // 选中的角色相关

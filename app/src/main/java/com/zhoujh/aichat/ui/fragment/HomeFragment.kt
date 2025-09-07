@@ -39,7 +39,6 @@ class HomeFragment : Fragment() {
     private lateinit var viewModel: CharacterViewModel
     private lateinit var characterAdapter: CharacterAdapter
     private lateinit var aiCharacterDao: AICharacterDao
-    private val userId = AppContext.USER_ID
 
     override fun onCreateView(
         inflater: LayoutInflater,

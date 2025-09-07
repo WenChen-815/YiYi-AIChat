@@ -23,6 +23,7 @@
         android:id="@+id/customBottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- 首页导航项 -->
@@ -66,6 +67,7 @@
             android:background="@drawable/add_button_background"
             android:contentDescription="新增角色"
             android:layout_marginVertical="5dp"
+            android:elevation="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/navMessage"
             app:layout_constraintStart_toEndOf="@id/navSearch"

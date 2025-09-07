@@ -21,9 +21,9 @@
             android:background="?attr/colorPrimary">
             <ImageView
                 android:id="@+id/ivMenu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_menu_gallery"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@mipmap/menu"
                 android:contentDescription="打开抽屉" />
             <TextView
                 android:id="@+id/tvCurrentCharacter"
@@ -60,11 +60,11 @@
             <EditText
                 android:id="@+id/etMessage"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bg_edit_text"
                 android:hint=" 请友好交流哦"
                 android:paddingHorizontal="5dp"
-                android:paddingVertical="3dp"
+                android:paddingVertical="5dp"
                 android:textSize="13sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/progressBar"
@@ -90,7 +90,6 @@
                 android:background="@drawable/blue_round_button"
                 android:text="发送"
                 android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/progressBar"

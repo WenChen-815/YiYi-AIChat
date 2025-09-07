@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.zhoujh.aichat.databinding.ActivityMainBinding
 import com.zhoujh.aichat.app.manager.AIChatManager
+import com.zhoujh.aichat.app.manager.ConfigManager
 import com.zhoujh.aichat.ui.fragment.HomeFragment
 import com.zhoujh.aichat.utils.StatusBarUtil
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.MainScope
 
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var configManager: ConfigManager
     private val fragmentList = listOf(
         HomeFragment(),
 //        SearchFragment(),
@@ -31,6 +33,15 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         StatusBarUtil.transparentNavBar(this)
         // 设置状态栏文字颜色为白色
         StatusBarUtil.setStatusBarTextColor(this, false)
+
+        // 初始化配置管理器
+        configManager = ConfigManager()
+        // 检查是否有配置，如果没有则跳转到配置页面
+        if (!configManager.hasCompleteConfig()) {
+            startActivity(Intent(this, ConfigActivity::class.java))
+            finish()
+            return
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

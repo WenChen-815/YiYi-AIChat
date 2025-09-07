@@ -36,6 +36,7 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         configManager = ConfigManager()
         setupViews()
         setupListeners()
+        binding.btnLoadModels.performClick()
     }
 
     private fun setupViews() {
@@ -67,6 +68,8 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             val apiKey = binding.etApiKey.text.toString().trim()
             val baseUrl = binding.etBaseUrl.text.toString().trim()
             val selectedModelPosition = binding.spinnerModels.selectedItemPosition
+            val userId = binding.etUserId.text.toString().trim()
+            val userName = binding.etUserName.text.toString().trim()
 
             if (apiKey.isEmpty() || baseUrl.isEmpty()) {
                 Toast.makeText(this, "请填写完整的API Key和中转地址", Toast.LENGTH_SHORT).show()
@@ -82,6 +85,8 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             configManager.saveApiKey(apiKey)
             configManager.saveBaseUrl(baseUrl)
             configManager.saveSelectedModel(models[selectedModelPosition].id)
+            configManager.saveUserId(userId)
+            configManager.saveUserName(userName)
 
             Toast.makeText(this, "配置保存成功", Toast.LENGTH_SHORT).show()
 

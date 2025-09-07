@@ -10,22 +10,38 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="6dp"
+            android:text="角色配置"
+            android:layout_marginBottom="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold" />
         <!-- 角色名称输入 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="6dp"
             android:text="角色名称"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <EditText
             android:id="@+id/et_character_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="请输入角色名称"
+            android:elevation="4dp"
+            android:background="@drawable/bg_edit_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:layout_marginHorizontal="6dp"
             android:inputType="textPersonName"
+            android:textSize="14sp"
             android:maxLines="1" />
 
         <!-- 提示词输入 -->
@@ -33,15 +49,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="6dp"
             android:text="提示词"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <EditText
             android:id="@+id/et_prompt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top"
-            android:elevation="2dp"
+            android:elevation="4dp"
+            android:layout_marginHorizontal="6dp"
+            android:background="@drawable/bg_edit_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
             android:hint="请输入角色提示词（描述角色的性格、行为等）"
             android:textSize="14sp"
             android:inputType="textMultiLine" />
@@ -51,15 +72,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="6dp"
             android:text="长期记忆"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <EditText
             android:id="@+id/et_memory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top"
-            android:elevation="2dp"
+            android:elevation="4dp"
+            android:layout_marginHorizontal="6dp"
+            android:background="@drawable/bg_edit_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
             android:hint="暂无长期记忆"
             android:textSize="14sp"
             android:inputType="textMultiLine" />
@@ -100,7 +126,7 @@
             android:layout_marginTop="32dp"
             android:backgroundTint="?attr/colorPrimary"
             android:text="保存角色"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/white" />
         <!-- 取消按钮 -->
         <Button
             android:id="@+id/btn_cancel"
@@ -109,7 +135,7 @@
             android:layout_marginTop="32dp"
             android:backgroundTint="?attr/colorPrimary"
             android:text="取消编辑"
-            android:textColor="@android:color/black" />
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
 </ScrollView>
