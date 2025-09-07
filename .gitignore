@@ -3,13 +3,11 @@
 /build/
 *.iml
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.idea/
 .DS_Store
 /captures
 .externalNativeBuild
 .cxx
+# 忽略Android构建产物
+app/release/
+app/keystore/
