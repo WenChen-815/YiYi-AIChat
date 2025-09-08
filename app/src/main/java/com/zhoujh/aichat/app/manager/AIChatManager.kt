@@ -138,6 +138,7 @@ object AIChatManager {
         apiService.sendMessage(
             messages = messages,
             model = selectedModel,
+            temperature = 1.1f,
             onSuccess = { aiResponse ->
                 // 收到回复
 //                Log.d(TAG,"原始的AI回复:$aiResponse")
@@ -230,6 +231,7 @@ object AIChatManager {
         apiService.sendMessage(
             messages = messages,
             model = selectedModel,
+            temperature = 0.3f,
             onSuccess = { aiResponse ->
                 // 收到回复
                 var newMemoryContent =

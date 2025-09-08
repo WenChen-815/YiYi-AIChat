@@ -9,6 +9,7 @@ import com.zhoujh.aichat.databinding.ActivityMainBinding
 import com.zhoujh.aichat.app.manager.AIChatManager
 import com.zhoujh.aichat.app.manager.ConfigManager
 import com.zhoujh.aichat.ui.fragment.HomeFragment
+import com.zhoujh.aichat.ui.fragment.ProfileFragment
 import com.zhoujh.aichat.utils.StatusBarUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -18,14 +19,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     private lateinit var configManager: ConfigManager
     private val fragmentList = listOf(
         HomeFragment(),
-//        SearchFragment(),
 //        PlaceholderFragment(), // 占位Fragment，对应中间按钮位置
-//        MessageFragment(),
-//        ProfileFragment()
-        HomeFragment(),
-        HomeFragment(),
-        HomeFragment(),
-        HomeFragment()
+        ProfileFragment()
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +62,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         }
 
         // 搜索点击
-        binding.navSearch.setOnClickListener {
-            switchPage(1)
-        }
+//        binding.navSearch.setOnClickListener {
+//            switchPage(1)
+//        }
 
         // 发布按钮点击（单独逻辑，不切换页面）
         binding.navAdd.setOnClickListener {
@@ -78,13 +73,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         }
 
         // 消息点击
-        binding.navMessage.setOnClickListener {
-            switchPage(3)
-        }
+//        binding.navMessage.setOnClickListener {
+//            switchPage(3)
+//        }
 
         // 我的点击
         binding.navMine.setOnClickListener {
-            switchPage(4)
+            switchPage(2)
         }
 
         // 默认选中首页
@@ -98,16 +93,16 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
         // 重置所有导航项的选中状态
         binding.navHome.isSelected = false
-        binding.navSearch.isSelected = false
-        binding.navMessage.isSelected = false
+//        binding.navSearch.isSelected = false
+//        binding.navMessage.isSelected = false
         binding.navMine.isSelected = false
 
         // 设置当前导航项为选中状态
         when (position) {
             0 -> binding.navHome.isSelected = true
-            1 -> binding.navSearch.isSelected = true
-            3 -> binding.navMessage.isSelected = true
-            4 -> binding.navMine.isSelected = true
+//            1 -> binding.navSearch.isSelected = true
+//            3 -> binding.navMessage.isSelected = true
+            2 -> binding.navMine.isSelected = true
         }
     }
 }

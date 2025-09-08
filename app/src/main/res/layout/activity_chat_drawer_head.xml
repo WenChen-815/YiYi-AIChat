@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="180dp"
-    android:background="?attr/colorPrimary"
+    android:background="@drawable/gradient_three_colors"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp"
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@color/black"
         android:textSize="20sp" />
 
     <TextView
@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:text="当前模型"
+        android:textColor="@color/black"
         android:textSize="14sp" />
 
 </LinearLayout>

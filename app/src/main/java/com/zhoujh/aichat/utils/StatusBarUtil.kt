@@ -2,10 +2,12 @@ package com.zhoujh.aichat.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
@@ -179,4 +181,26 @@ object StatusBarUtil {
             }
         }
     }
+
+    // 在 Activity 或 View 中使用
+    fun getStatusBarHeight(view: View, resources: Resources): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insets = view.rootWindowInsets?.getInsets(WindowInsets.Type.statusBars())
+            return insets?.top ?: 0
+        }
+        // 回退到旧方法
+        val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resourceId > 0) resources.getDimensionPixelSize(resourceId) else 0
+    }
+
+    fun getNavigationBarHeight(view: View, resources: Resources): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insets = view.rootWindowInsets?.getInsets(WindowInsets.Type.navigationBars())
+            return insets?.bottom ?: 0
+        }
+        // 回退到旧方法
+        val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        return if (resourceId > 0) resources.getDimensionPixelSize(resourceId) else 0
+    }
+
 }

@@ -46,10 +46,6 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        binding.btnChat.setOnClickListener {
-            val intent = Intent(requireContext(), ChatActivity::class.java)
-            startActivity(intent)
-        }
 
         aiCharacterDao = AppContext.appDatabase.aiCharacterDao()
 

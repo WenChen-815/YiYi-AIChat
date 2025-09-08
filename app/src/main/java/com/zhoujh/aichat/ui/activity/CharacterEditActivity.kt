@@ -1,6 +1,7 @@
 package com.zhoujh.aichat.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -115,8 +116,9 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
         if (characterId == null) {
             launch(Dispatchers.IO) {
                 var result = aiCharacterDao.insertAICharacter(character)
+                var result2 = aiChatMemoryDao.insert(memoryEntity)
                 withContext(Dispatchers.Main) {
-                    if (result > 0) {
+                    if (result > 0 && result2 > 0) {
                         Toast.makeText(this@CharacterEditActivity, "添加成功", Toast.LENGTH_SHORT)
                             .show()
                     } else {
@@ -130,6 +132,7 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
                 var result = aiCharacterDao.updateAICharacter(character)
                 var result2 = aiChatMemoryDao.update(memoryEntity)
                 withContext(Dispatchers.Main) {
+                    Log.d("CharacterEditActivity", " $result $result2")
                     if (result > 0 && result2 > 0) {
                         Toast.makeText(this@CharacterEditActivity, "更新成功", Toast.LENGTH_SHORT)
                             .show()

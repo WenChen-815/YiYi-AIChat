@@ -30,11 +30,12 @@ class ApiService(private val baseUrl: String, private val apiKey: String) {
     fun sendMessage(
         messages: MutableList<Message>,
         model: String,
+        temperature: Float? = 1.00f,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         // 创建请求体对象
-        val chatRequest = ChatRequest(model, messages)
+        val chatRequest = ChatRequest(model, messages,temperature)
 
         // 使用Gson将请求体对象转换为JSON字符串
         val requestBodyStr = gson.toJson(chatRequest)
@@ -118,7 +119,8 @@ class ApiService(private val baseUrl: String, private val apiKey: String) {
     // 定义聊天请求体的数据类
     data class ChatRequest(
         val model: String,
-        val messages: List<Message>
+        val messages: List<Message>,
+        val temperature: Float? = null
     ) {
         override fun toString(): String {
             return "ChatRequest(model='$model', messagesCount=${messages.size}, messages=\n${

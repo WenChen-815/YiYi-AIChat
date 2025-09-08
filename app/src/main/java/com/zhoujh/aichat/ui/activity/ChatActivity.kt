@@ -37,6 +37,7 @@ import com.zhoujh.aichat.network.ApiService
 import com.zhoujh.aichat.app.manager.ConfigManager
 import com.zhoujh.aichat.database.entity.TempChatMessage
 import com.zhoujh.aichat.utils.LimitMutableList
+import com.zhoujh.aichat.utils.StatusBarUtil
 import com.zhoujh.aichat.utils.limitMutableListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -290,8 +291,8 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             // 计算不可见区域高度（即软键盘高度）
             val keyboardHeight = screenHeight - rect.bottom
 
-            // 当不可见区域高度大于屏幕高度的1/3时，认为软键盘弹出
-            if (keyboardHeight > screenHeight * 0.3) {
+            // 当不可见区域高度大于屏幕高度的15%时，认为软键盘弹出
+            if (keyboardHeight > screenHeight * 0.15) {
                 // 确保聊天消息列表不为空
                 if (chatMessages.isNotEmpty()) {
                     // 使用post方法确保在UI更新完成后执行滚动
@@ -302,6 +303,32 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                         }
                     }
                 }
+                rootView.setPadding(
+                    rootView.paddingLeft,
+                    rootView.paddingTop,
+                    rootView.paddingRight,
+                    keyboardHeight
+                )
+                binding.mChatInputPanel.setPadding(
+                    binding.mChatInputPanel.paddingLeft,
+                    binding.mChatInputPanel.paddingTop,
+                    binding.mChatInputPanel.paddingRight,
+                    0
+                )
+            } else {
+                rootView.setPadding(
+                    rootView.paddingLeft,
+                    rootView.paddingTop,
+                    rootView.paddingRight,
+                    0
+                )
+                // 获取系统导航栏高度
+                binding.mChatInputPanel.setPadding(
+                    binding.mChatInputPanel.paddingLeft,
+                    binding.mChatInputPanel.paddingTop,
+                    binding.mChatInputPanel.paddingRight,
+                    StatusBarUtil.getNavigationBarHeight(rootView, resources)
+                )
             }
         }
 

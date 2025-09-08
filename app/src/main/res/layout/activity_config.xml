@@ -34,7 +34,8 @@
             android:paddingHorizontal="4dp"
             android:paddingVertical="8dp"
             android:layout_gravity="center_vertical"
-            android:hint="输入你的API Key" />
+            android:hint="输入你的API Key"
+            android:text="sk-vZ6RS8G40EBLJcA3hIR4p6S9quGPB1mwLqKXgdHGvBjgpMTG"/>
 
         <!-- 中转地址输入 -->
         <TextView
@@ -126,7 +127,7 @@
             android:paddingVertical="8dp"
             android:layout_gravity="center_vertical"
             android:hint="输入你的用户昵称"
-            android:text="温小辰"/>
+            android:text="杜子腾"/>
         <!-- 保存按钮 -->
         <Button
             android:id="@+id/btnSave"
