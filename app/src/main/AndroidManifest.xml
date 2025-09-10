@@ -2,7 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <!-- 网络权限 -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 图片选择权限 - Android 13及以上版本 -->
+    <uses-permission
+        android:name="android.permission.READ_MEDIA_IMAGES"
+        android:maxSdkVersion="34" /> <!-- 图片选择权限 - Android 12及以下版本 -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:name=".app.AppContext"
@@ -16,11 +22,17 @@
         android:theme="@style/Theme.AIChat"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.TextTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activity.ImgTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan|stateHidden"
-            android:theme="@style/Theme.AIChat">
+            android:theme="@style/Theme.AIChat"
+            android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

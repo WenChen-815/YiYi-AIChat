@@ -1,9 +1,15 @@
 package com.zhoujh.aichat.ui.activity
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.zhoujh.aichat.databinding.ActivityMainBinding
 import com.zhoujh.aichat.app.manager.AIChatManager
@@ -17,6 +23,7 @@ import kotlinx.coroutines.MainScope
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var configManager: ConfigManager
+    private val REQUEST_CODE_PERMISSION = 1002
     private val fragmentList = listOf(
         HomeFragment(),
 //        PlaceholderFragment(), // 占位Fragment，对应中间按钮位置
@@ -37,6 +44,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             finish()
             return
         }
+
+        // 在进入界面时动态请求权限
+        requestImagePermissionOnStartup()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -103,6 +113,47 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 //            1 -> binding.navSearch.isSelected = true
 //            3 -> binding.navMessage.isSelected = true
             2 -> binding.navMine.isSelected = true
+        }
+    }
+    // 在进入界面时请求权限的方法
+    private fun requestImagePermissionOnStartup() {
+        // 检查Android版本，适配不同的权限模型
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // Android 14及以上版本 - 使用新的精选照片API，无需提前请求权限
+            Log.d("ImgTestActivity", "Android 14+，使用精选照片API无需提前请求权限")
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13 (API 33) - 使用READ_MEDIA_IMAGES权限
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES),
+                    REQUEST_CODE_PERMISSION
+                )
+            }
+        } else {
+            // Android 12及以下版本 - 使用READ_EXTERNAL_STORAGE权限
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                    REQUEST_CODE_PERMISSION
+                )
+            }
+        }
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSION && grantResults.isNotEmpty()) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("ImgTestActivity", "图片访问权限已授予")
+            } else {
+                // 权限被拒绝，显示提示信息
+                Toast.makeText(this, "需要存储权限才能选择图片", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

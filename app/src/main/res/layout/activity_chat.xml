@@ -91,9 +91,22 @@
                 android:text="发送"
                 android:textColor="@color/black"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnSendImg"
                 app:layout_constraintStart_toEndOf="@+id/progressBar"
             />
+            <Button
+                android:id="@+id/btnSendImg"
+                android:layout_width="80dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/blue_round_button"
+                app:backgroundTint="@null"
+                android:text="发图"
+                android:textColor="@color/black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnSend"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 

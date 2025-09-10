@@ -1,10 +1,14 @@
 package com.zhoujh.aichat.ui.activity
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Rect
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -31,6 +36,7 @@ import com.zhoujh.aichat.databinding.ActivityChatBinding
 import com.zhoujh.aichat.database.entity.AICharacter
 import com.zhoujh.aichat.app.manager.AIChatManager
 import com.zhoujh.aichat.app.manager.AIChatMessageListener
+import com.zhoujh.aichat.app.manager.ChatImageManager
 import com.zhoujh.aichat.database.entity.ChatMessage
 import com.zhoujh.aichat.network.model.Model
 import com.zhoujh.aichat.network.ApiService
@@ -44,6 +50,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.IOException
 
 class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     NavigationView.OnNavigationItemSelectedListener {
@@ -51,6 +59,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
     // 常量定义
     private val TAG = "ChatActivity"
     private var MAX_CONTEXT_MESSAGE_SIZE = 5
+    private val REQUEST_CODE_PICK_IMAGE = 1001
 
     // 布局与视图相关变量
     private lateinit var binding: ActivityChatBinding
@@ -163,6 +172,17 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
 
             }
         }
+        if (requestCode == REQUEST_CODE_PICK_IMAGE && resultCode == RESULT_OK && data != null) {
+            val imageUri = data.data
+            try {
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
+                sendImage(bitmap)
+                Toast.makeText(this, "图片选择成功", Toast.LENGTH_SHORT).show()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Toast.makeText(this, "图片加载失败", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -259,6 +279,11 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         // 发送按钮点击事件
         binding.btnSend.setOnClickListener {
             sendMessage()
+        }
+
+        // 发送图片按钮点击事件
+        binding.btnSendImg.setOnClickListener {
+            pickImageFromGallery()
         }
 
         // 软键盘回车发送
@@ -360,6 +385,48 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                 messageText,
                 tempChatContext
             )
+        }
+    }
+    private fun pickImageFromGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // Android 14及以上版本 - 使用新的精选照片API
+            val intent = Intent(MediaStore.ACTION_PICK_IMAGES)
+            intent.type = "image/*"
+            startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE)
+        } else {
+            // 旧版本使用传统方法
+            val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE)
+        }
+    }
+    // 发送图片
+    private fun sendImage(bitmap: Bitmap) {
+        val tempChatContext = chatContext
+        // 将图片保存到应用私有目录，避免权限问题
+        val file = File(cacheDir, "temp_image_${System.currentTimeMillis()}.jpg")
+        // 初始化管理器
+        val imageManager = ChatImageManager(this@ChatActivity)
+        val conversationId = "${configManager.getUserId().toString()}_$currentCharacterId"
+        try {
+            // 保存图片
+            val savedFile = imageManager.saveImageToConversation(conversationId, bitmap)
+            if (savedFile != null) {
+                // 保存成功
+//                val imagePath = savedFile.absolutePath
+                val savedUri = Uri.fromFile(savedFile)
+                // 发送图片到AI
+                launch {
+                    AIChatManager.sendImage(
+                        currentAICharacter,
+                        bitmap,
+                        savedUri, // 使用保存后的URI
+                        tempChatContext,
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "图片保存失败", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -538,14 +605,19 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         // 添加新的消息到列表中
         chatMessages.add(message)
         // 添加到聊天上下文中
-        val tempMessage = TempChatMessage(
-            id = message.id,
-            content = message.content,
-            type = message.type,
-            characterId = message.characterId,
-            chatUserId = message.chatUserId
-        )
-        chatContext.add(tempMessage)
+        if (message.imgUrl == null && message.voiceUrl == null) {
+            val tempMessage = TempChatMessage(
+                id = message.id,
+                content = message.content,
+                type = message.type,
+                characterId = message.characterId,
+                chatUserId = message.chatUserId,
+                contentType = message.contentType,
+                timestamp = message.timestamp,
+                isShow = message.isShow
+            )
+            chatContext.add(tempMessage)
+        }
 //        Log.d("chatContext", "chatContext[ ${chatContext.map { it -> it.content }}]")
         // 提交列表数据到适配器中
         chatAdapter.setMessages(chatMessages) {

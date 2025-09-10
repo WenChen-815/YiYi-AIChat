@@ -10,6 +10,11 @@ class ConfigManager() {
     private val KEY_API_KEY = "api_key"
     private val KEY_BASE_URL = "base_url"
     private val KEY_SELECTED_MODEL = "selected_model"
+    // 添加图片识别相关的KEY
+    private val KEY_IMG_RECOGNITION_ENABLED = "img_recognition_enabled"
+    private val KEY_IMG_API_KEY = "img_api_key"
+    private val KEY_IMG_BASE_URL = "img_base_url"
+    private val KEY_SELECTED_IMG_MODEL = "selected_img_model"
 
     private val prefs: SharedPreferences =
         AppContext.getInstance().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -90,5 +95,45 @@ class ConfigManager() {
     // 清除所有配置
     fun clearAllConfig() {
         prefs.edit { clear() }
+    }
+
+    // ===== 图片识别相关配置 =====
+    // 保存图片识别开关状态
+    fun saveImgRecognitionEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_IMG_RECOGNITION_ENABLED, enabled) }
+    }
+
+    // 获取图片识别开关状态
+    fun isImgRecognitionEnabled(): Boolean {
+        return prefs.getBoolean(KEY_IMG_RECOGNITION_ENABLED, false)
+    }
+    // 保存图片识别API Key
+    fun saveImgApiKey(apiKey: String) {
+        prefs.edit { putString(KEY_IMG_API_KEY, apiKey) }
+    }
+
+    // 获取图片识别API Key
+    fun getImgApiKey(): String? {
+        return prefs.getString(KEY_IMG_API_KEY, null)
+    }
+
+    // 保存图片识别中转地址
+    fun saveImgBaseUrl(baseUrl: String) {
+        prefs.edit { putString(KEY_IMG_BASE_URL, baseUrl) }
+    }
+
+    // 获取图片识别中转地址
+    fun getImgBaseUrl(): String? {
+        return prefs.getString(KEY_IMG_BASE_URL, null)
+    }
+
+    // 保存选中的图片识别模型
+    fun saveSelectedImgModel(modelId: String) {
+        prefs.edit { putString(KEY_SELECTED_IMG_MODEL, modelId) }
+    }
+
+    // 获取选中的图片识别模型
+    fun getSelectedImgModel(): String? {
+        return prefs.getString(KEY_SELECTED_IMG_MODEL, null)
     }
 }

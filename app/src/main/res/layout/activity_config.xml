@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -17,7 +17,38 @@
             android:text="API 配置"
             android:textSize="20sp"
             android:textStyle="bold" />
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="用户ID:（配置用户ID，但是现在没啥用，默认123123就行）"
+            android:textSize="14sp" />
+        <EditText
+            android:id="@+id/etUserId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit_text"
+            android:hint="输入你的用户ID"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:layout_gravity="center_vertical"
+            android:text="123123"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="用户昵称:（这个是真有用，AI会识别的名字）"
+            android:textSize="14sp" />
+        <EditText
+            android:id="@+id/etUserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_edit_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:layout_gravity="center_vertical"
+            android:hint="输入你的用户昵称"
+            android:text="温辰"/>
         <!-- API Key 输入 -->
         <TextView
             android:layout_width="match_parent"
@@ -35,7 +66,7 @@
             android:paddingVertical="8dp"
             android:layout_gravity="center_vertical"
             android:hint="输入你的API Key"
-            android:text="sk-vZ6RS8G40EBLJcA3hIR4p6S9quGPB1mwLqKXgdHGvBjgpMTG"/>
+            android:text="sk-qbSBnAiRNdDUT5i7NkMPWebAn7g8z96YbYMsTBDmqzeWtVvd"/>
 
         <!-- 中转地址输入 -->
         <TextView
@@ -95,39 +126,88 @@
                 android:visibility="gone" />
         </LinearLayout>
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchImgRecognition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="开启图片识别" />
+        <!-- API Key 输入 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="用户ID:（配置用户ID，但是现在没啥用，默认123123就行）"
+            android:text="图片识别API Key:"
             android:textSize="14sp" />
 
         <EditText
-            android:id="@+id/etUserId"
+            android:id="@+id/etImgApiKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_edit_text"
-            android:hint="输入你的用户ID"
             android:paddingHorizontal="4dp"
             android:paddingVertical="8dp"
             android:layout_gravity="center_vertical"
-            android:text="123123"/>
+            android:hint="输入你的API Key"
+            android:text="sk-qbSBnAiRNdDUT5i7NkMPWebAn7g8z96YbYMsTBDmqzeWtVvd"/>
+
+        <!-- 中转地址输入 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="用户昵称:（这个是真有用，AI会识别的名字）"
+            android:layout_marginTop="16dp"
+            android:text="图片识别中转地址:"
             android:textSize="14sp" />
+
         <EditText
-            android:id="@+id/etUserName"
+            android:id="@+id/etImgBaseUrl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="例如: https://vg.xxxx.cc"
             android:background="@drawable/bg_edit_text"
             android:paddingHorizontal="4dp"
             android:paddingVertical="8dp"
             android:layout_gravity="center_vertical"
-            android:hint="输入你的用户昵称"
-            android:text="杜子腾"/>
+            android:inputType="textUri"
+            android:text="https://vg.v1api.cc" />
+
+        <!-- 模型选择 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="选择图片识别模型(请确保具备图片识别功能):"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <Spinner
+                android:id="@+id/spinnerImgModels"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edit_text"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="8dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/btnLoadImgModels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="加载模型" />
+
+            <ProgressBar
+                android:id="@+id/progressImgBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
         <!-- 保存按钮 -->
         <Button
             android:id="@+id/btnSave"
@@ -138,4 +218,4 @@
             android:text="保存配置"
             android:textColor="@color/white" />
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

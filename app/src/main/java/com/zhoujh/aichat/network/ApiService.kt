@@ -6,6 +6,7 @@ import com.zhoujh.aichat.network.model.ModelsResponse
 import com.google.gson.Gson
 import com.zhoujh.aichat.network.model.Message
 import com.zhoujh.aichat.network.model.Model
+import com.zhoujh.aichat.utils.LogUtil
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -16,11 +17,16 @@ import okhttp3.Response
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class ApiService(private val baseUrl: String, private val apiKey: String) {
+class ApiService(private val baseUrl: String,
+                 private val apiKey: String,
+                 private val imgBaseUrl: String? = null,
+                 private val imgApiKey: String? = null,
+                 private val ttsBaseUrl: String? = null,
+                 private val ttsApiKey: String? = null) {
     private val tag = "ApiService"
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
         .build()
     private val gson = Gson()
@@ -116,18 +122,87 @@ class ApiService(private val baseUrl: String, private val apiKey: String) {
         })
     }
 
+    // 发送多模态消息（支持图片）
+    fun sendMultimodalMessage(
+        prompt: String,
+        imageBase64: String,
+        model: String,
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        // 创建请求体对象
+        val contentItems = mutableListOf<ContentItem>()
+        // 添加文本内容
+        contentItems.add(ContentItem("text", prompt))
+        // 添加图片内容
+        contentItems.add(ContentItem("image_url", image_url = mapOf("url" to "data:image/jpeg;base64,$imageBase64")))
+
+        val message = MultimodalMessage("user", contentItems)
+        val messages = listOf(message)
+
+        val chatRequest = MultimodalChatRequest(model, messages)
+
+        // 使用Gson将请求体对象转换为JSON字符串
+        val requestBodyStr = gson.toJson(chatRequest)
+        val requestBody = requestBodyStr.toRequestBody(jsonMediaType)
+//        Log.d(tag, "Multimodal request: $requestBodyStr")
+        LogUtil.d(tag, "Multimodal request: $requestBodyStr")
+        // 构建请求
+        val request = Request.Builder()
+            .url("$baseUrl/v1/chat/completions")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .addHeader("Content-Type", "application/json")
+            .post(requestBody)
+            .build()
+
+        // 执行请求
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                onError("网络请求失败：${e.message ?: "未知错误"}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string() ?: ""
+                if (response.isSuccessful) {
+                    try {
+                        val chatResponse = gson.fromJson(responseBody, ChatResponse::class.java)
+                        val aiMessage = chatResponse.choices?.firstOrNull()?.message?.content
+                        if (aiMessage.isNullOrEmpty()) {
+                            onError("未获取到AI回复")
+                        } else {
+                            onSuccess(aiMessage)
+                        }
+                    } catch (e: Exception) {
+                        onError("解析响应失败：${e.message}")
+                    }
+                } else {
+                    onError("请求失败：$responseBody（状态码：${response.code}）")
+                    Log.d(tag, "Multimodal request failed: $responseBody (code: ${response.code})")
+                }
+            }
+        })
+    }
     // 定义聊天请求体的数据类
     data class ChatRequest(
         val model: String,
         val messages: List<Message>,
         val temperature: Float? = null
-    ) {
-        override fun toString(): String {
-            return "ChatRequest(model='$model', messagesCount=${messages.size}, messages=\n${
-                messages.joinToString(
-                    ", \n"
-                ) { "[role=${it.role}, content=${it.content?.take(50)}${if ((it.content?.length ?: 0) > 50) "..." else ""}]" }
-            })"
-        }
-    }
+    )
+
+    // 定义多模态聊天请求体的数据类
+    data class MultimodalChatRequest(
+        val model: String,
+        val messages: List<MultimodalMessage>
+    )
+
+    data class MultimodalMessage(
+        val role: String,
+        val content: List<ContentItem>
+    )
+
+    data class ContentItem(
+        val type: String,
+        val text: String? = null,
+        val image_url: Map<String, String>? = null
+    )
 }

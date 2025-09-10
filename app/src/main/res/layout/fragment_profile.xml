@@ -19,4 +19,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="SETTING" />
+    <Button
+        android:id="@+id/btn_text_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEXT TEST" />
+    <Button
+        android:id="@+id/btn_img_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IMG TEST" />
 </LinearLayout>
