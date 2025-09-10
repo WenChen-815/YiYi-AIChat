@@ -515,7 +515,15 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             chatMessages.addAll(reversedMessages) // 反转降序数据为升序
             chatAdapter.setMessages(reversedMessages) {
                 // 滚动到底部
-                binding.rvChat.scrollToPosition(chatAdapter.itemCount - 1)
+//                binding.rvChat.scrollToPosition(chatAdapter.itemCount - 1)
+                // 上面这个滚动到底部的方法会让最后一条消息有一点加载不出来，而下面这个方法可以实现平滑过渡到底部
+                binding.rvChat.post {
+                    val itemCount = chatAdapter.getProcessedItemCount()
+                    if (itemCount > 0) {
+                        // 平滑滚动到底部
+                        (binding.rvChat.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(itemCount - 1, 0)
+                    }
+                }
             }
             currentPage = 1
             // 检查是否还有更多数据

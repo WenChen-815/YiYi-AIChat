@@ -3,10 +3,12 @@ package com.zhoujh.aichat.ui.adapter
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +24,8 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestListener
+import com.zhoujh.aichat.R
+import com.zhoujh.aichat.ui.activity.ImgTestActivity
 
 class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessageDiffCallback()) {
 
@@ -30,6 +34,9 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
         private const val VIEW_TYPE_AI = 2
         private const val VIEW_TYPE_SYSTEM = 3
     }
+
+    // 回调接口
+    var onImageLoadedCallback: (() -> Unit)? = null
 
     // 存储处理后的消息列表
     private var processedMessages: List<ChatMessage> = emptyList()
@@ -76,12 +83,24 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
 
     inner class UserMessageViewHolder(private val binding: ItemUserMessageBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
+        /*
+         * [修复 图片消息布局错乱问题]
+         * > 错因:RecycleView高效的复用机制，让ViewHolder的控件自动复用在本次布局中 被复用控件有设置 但当前控件未设置的属性
+         * 例如:bind方法中通过判断资源类型设置图片资源/文本资源，现在子控件a调用了ImageView设置了图片资源，
+         * 而子控件b仅调用TextView设置文本资源，如果滚动到子控件b且恰好复用子控件a时，
+         * 由于子控件b的ImageView没有设置过图片资源，所以复用子控件a的图片展示，
+         * 又因自身设置了文本资源，导致两种资源叠加展示。蒸的饭！*/
         fun bind(message: ChatMessage) {
             when(message.contentType) {
-                MessageContentType.TEXT -> binding.tvUserMessage.text = message.content
+                MessageContentType.TEXT -> {
+                    binding.img.visibility = View.GONE
+                    binding.tvUserMessage.visibility = View.VISIBLE
+                    binding.tvUserMessage.text = message.content
+                    binding.bg.background = AppCompatResources.getDrawable(binding.root.context,R.drawable.bubble_me)
+                }
                 MessageContentType.IMAGE -> {
-                    Log.d("ChatAdapter", "UserMessageViewHolder bind: message.imgUrl = ${message.imgUrl}")
+                    binding.img.visibility = View.VISIBLE
+                    binding.tvUserMessage.visibility = View.GONE
                     showImage(message,binding.bg,binding.root,binding.img)
                 }
 //                MessageContentType.VOICE -> binding.ivUserMessage.setImageURI(message.voiceUrl)
@@ -95,9 +114,15 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
 
         fun bind(message: ChatMessage) {
             when(message.contentType) {
-                MessageContentType.TEXT -> binding.tvAiMessage.text = message.content
+                MessageContentType.TEXT -> {
+                    binding.img.visibility = View.GONE
+                    binding.tvAiMessage.visibility = View.VISIBLE
+                    binding.tvAiMessage.text = message.content
+                    binding.bg.background = AppCompatResources.getDrawable(binding.root.context,R.drawable.bubble_other)
+                }
                 MessageContentType.IMAGE -> {
-                    Log.d("ChatAdapter", "AiMessageViewHolder bind: message.imgUrl = ${message.imgUrl}")
+                    binding.img.visibility = View.VISIBLE
+                    binding.tvAiMessage.visibility = View.GONE
                     showImage(message,binding.bg,binding.root,binding.img)
                 }
 //                MessageContentType.VOICE -> binding.ivAiMessage.setImageURI(message.voiceUrl)
@@ -137,6 +162,7 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
                             content = parts[i],
                             type = message.type,
                             timestamp = message.timestamp + i, // 稍微调整时间戳以保证唯一性
+                            contentType = message.contentType,
                             characterId = message.characterId,
                             chatUserId = message.chatUserId
                         )
@@ -177,9 +203,9 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
         Glide.with(root)
             .load(message.imgUrl?.toUri())
             .fitCenter()
-//            .override(400, 400) // 设置最大尺寸
+            .override(200, 200) // 设置最大尺寸
             // 添加圆角效果，参数为圆角半径（单位：像素）
-            .transform(RoundedCorners(50)) // 20像素的圆角
+            .transform(RoundedCorners(10)) // 10像素的圆角
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -187,7 +213,7 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
                     target: com.bumptech.glide.request.target.Target<Drawable>,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Log.e("ChatAdapter", "Image load failed: ${e?.message}")
+//                    Log.e("ChatAdapter", "Image load failed: ${e?.message}")
                     return false
                 }
 
@@ -198,7 +224,7 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
                     dataSource: DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
-                    Log.d("ChatAdapter", "Image loaded successfully")
+//                    Log.d("ChatAdapter", "Image loaded successfully")
                     return false
                 }
             })

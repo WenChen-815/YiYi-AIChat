@@ -4,7 +4,6 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="2dp"
     android:gravity="start"
-    android:elevation="6dp"
     android:orientation="horizontal">
 
     <ImageView
@@ -21,18 +20,21 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="123dp"
-        android:background="@drawable/bubble_other"
-        android:padding="10dp">
+        android:background="@drawable/bubble_other">
 
         <TextView
             android:id="@+id/tvAiMessage"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"/>
 
         <ImageView
             android:id="@+id/img"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="200dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:visibility="gone"/>
     </RelativeLayout>
 
 </LinearLayout>
