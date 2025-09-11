@@ -12,6 +12,8 @@ import com.zhoujh.aichat.network.model.Message
 import com.zhoujh.aichat.database.entity.MessageType
 import com.zhoujh.aichat.database.entity.TempChatMessage
 import com.zhoujh.aichat.network.ApiService
+import com.zhoujh.aichat.network.ApiService.ContentItem
+import com.zhoujh.aichat.network.ApiService.MultimodalMessage
 import com.zhoujh.aichat.utils.ChatUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,8 +46,11 @@ object AIChatManager {
 
     // 为每个AICharacter维护一个独立的锁对象
     private val characterLocks = ConcurrentHashMap<String, Mutex>()
+    // 为每个AICharacter维护一个总结任务的防抖标记
+    private val characterSummarizeCooldown = ConcurrentHashMap<String, Long>()
+    private val SUMMARIZE_COOLDOWN_TIME = 5000L // 5秒防抖时间
     private var USER_ID = "123123";
-    private var USER_NAME = "USER_NAME";
+    private var USER_NAME = "USER_NAME"
 
     fun init() {
         configManager = ConfigManager()
@@ -73,7 +78,7 @@ object AIChatManager {
     // 发送消息 包含数据库操作 以及网络请求 需要在子线程
     suspend fun sendMessage(
         aiCharacter: AICharacter?,
-        newMessageText: String = "",
+        newMessageTexts: List<String>,
         oldMessages: List<TempChatMessage>,
         showInChat: Boolean = true
     ) {
@@ -92,22 +97,14 @@ object AIChatManager {
         }
         // 添加历史消息
         for (message in oldMessages) {
-            when (message.type) {
-                MessageType.SYSTEM -> {
-                    messages.add(Message("system", message.content))
-                }
-
-                MessageType.USER -> {
-                    messages.add(Message("user", message.content))
-                }
-
-                MessageType.AI -> {
-                    messages.add(Message("assistant", ChatUtil.parseMessage(message)))
-                }
+            if (message.type == MessageType.ASSISTANT) {
+                messages.add(Message(message.type.name.lowercase(), ChatUtil.parseMessage(message)))
+            } else {
+                messages.add(Message(message.type.name.lowercase(), message.content))
             }
         }
         // 最后处理新消息
-        if (!newMessageText.isEmpty()) {
+        for (newMessageText in newMessageTexts) {
             val currentDate =
                 SimpleDateFormat("yyyy-MM-dd EEEE HH:mm:ss", Locale.getDefault()).format(Date())
             val currentUserName = "[${USER_NAME}]"
@@ -168,7 +165,7 @@ object AIChatManager {
                 val aiMessage = ChatMessage(
                     id = "${aiCharacter.aiCharacterId}:${System.currentTimeMillis()}",
                     content = "$currentDate|${currentCharacterName}$aiResponse",
-                    type = MessageType.AI,
+                    type = MessageType.ASSISTANT,
                     characterId = aiCharacter.aiCharacterId,
                     chatUserId = USER_ID
                 )
@@ -179,7 +176,7 @@ object AIChatManager {
                         TempChatMessage(
                             id = "${aiCharacter.aiCharacterId}:${System.currentTimeMillis()}",
                             content = "$currentDate|${currentCharacterName}$aiResponse",
-                            type = MessageType.AI,
+                            type = MessageType.ASSISTANT,
                             characterId = aiCharacter.aiCharacterId,
                             chatUserId = USER_ID
                         )
@@ -211,8 +208,17 @@ object AIChatManager {
             Log.e(TAG, "summarize: 未选择AI角色")
             return
         }
-        // 获取该角色对应的锁，如果不存在则创建一个新的锁
+
+        // 检查防抖
         val characterId = aiCharacter.aiCharacterId
+        val currentTime = System.currentTimeMillis()
+        val lastSummarizeTime = characterSummarizeCooldown[characterId] ?: 0L
+        if (currentTime - lastSummarizeTime < SUMMARIZE_COOLDOWN_TIME) {
+            Log.d(TAG, "总结被防抖拦截，距离上次总结时间: ${currentTime - lastSummarizeTime}ms")
+            return
+        }
+
+        // 获取该角色对应的锁，如果不存在则创建一个新的锁
         val characterLock = characterLocks.computeIfAbsent(characterId) { Mutex() }
         // 尝试获取角色锁，如果已被锁定则等待
         characterLock.withLock {
@@ -343,7 +349,8 @@ object AIChatManager {
             onSuccess = { imgDescription ->
                 Log.d(TAG, "图片识别成功，回复：$imgDescription")
                 CoroutineScope(Dispatchers.IO).launch {
-                    sendMessage(character, "发送了图片:[$imgDescription]",oldMessages,false)
+                    val desc = "发送了图片:[$imgDescription]"
+                    sendMessage(character, listOf(desc) ,oldMessages,false)
                 }
             },
             onError = { errorMessage ->

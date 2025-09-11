@@ -53,8 +53,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 
-class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
-    NavigationView.OnNavigationItemSelectedListener {
+class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
 
     // 常量定义
     private val TAG = "ChatActivity"
@@ -63,11 +62,6 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
 
     // 布局与视图相关变量
     private lateinit var binding: ActivityChatBinding
-    private val headerView: View?
-        get() {
-            val headerView = binding.navView.getHeaderView(0)
-            return headerView
-        }
 
     // 适配器与数据列表相关变量
     private lateinit var chatAdapter: ChatAdapter
@@ -202,8 +196,8 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         apiService = ApiService(baseUrl, apiKey)
 
         // 更新抽屉头部的当前模型信息
-        val tvCurrentModelName = headerView?.findViewById<TextView>(R.id.tvCurrentModelName)
-        tvCurrentModelName?.text = selectedModel
+        binding.navView.tvCurrentModelName.text = selectedModel
+
     }
 
     private fun setupRecyclerView() {
@@ -273,8 +267,22 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             binding.drawerLayout.openDrawer(GravityCompat.START)
         }
 
-        // 设置导航视图的菜单项选中监听器
-        binding.navView.setNavigationItemSelectedListener(this)
+        // ===抽屉相关控件===
+        binding.navView.navConfig.setOnClickListener {
+            startActivity(Intent(this, ConfigActivity::class.java))
+        }
+        binding.navView.navSwitchModel.setOnClickListener {
+            showModelsDialog()
+        }
+        binding.navView.navClearChat.setOnClickListener {
+            clearChatHistory()
+        }
+        binding.navView.navAbout.setOnClickListener {
+            // showAboutDialog()
+            var s = chatMessages.map { it.content }
+            Log.d("Data", "$s")
+        }
+        // ===抽屉相关控件===
 
         // 发送按钮点击事件
         binding.btnSend.setOnClickListener {
@@ -382,7 +390,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
         launch {
             AIChatManager.sendMessage(
                 currentAICharacter,
-                messageText,
+                listOf(messageText),
                 tempChatContext
             )
         }
@@ -660,8 +668,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
                 configManager.saveSelectedModel(selectedModel)
 
                 // 更新抽屉头部的当前模型信息
-                val tvCurrentModelName = headerView?.findViewById<TextView>(R.id.tvCurrentModelName)
-                tvCurrentModelName?.text = selectedModel
+                binding.navView.tvCurrentModelName.text = selectedModel
 
                 dialog.dismiss()
 
@@ -702,29 +709,5 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(),
             .setMessage(getString(R.string.app_name) + "\n版本: 1.0\n\n一个基于AI的聊天应用")
             .setPositiveButton("确定", null)
             .show()
-    }
-
-    // 导航相关方法
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_config -> {
-                startActivity(Intent(this, ConfigActivity::class.java))
-            }
-
-            R.id.nav_switch_model -> {
-                showModelsDialog()
-            }
-
-            R.id.nav_clear_chat -> {
-                clearChatHistory()
-            }
-
-            R.id.nav_about -> {
-//                showAboutDialog()
-                var s = chatMessages.map { it.content }
-                Log.d("Data", "$s")
-            }
-        }
-        return true
     }
 }

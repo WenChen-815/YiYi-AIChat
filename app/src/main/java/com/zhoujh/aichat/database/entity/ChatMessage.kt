@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 enum class MessageType {
-    USER, AI, SYSTEM
+    USER, ASSISTANT, SYSTEM
 }
 enum class MessageContentType {
     TEXT, IMAGE, VOICE

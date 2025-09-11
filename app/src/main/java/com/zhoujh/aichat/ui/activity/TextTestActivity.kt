@@ -14,6 +14,8 @@ import com.zhoujh.aichat.network.ApiService
 import com.zhoujh.aichat.network.model.Message
 import com.zhoujh.aichat.network.model.Model
 import android.util.Log
+import com.zhoujh.aichat.network.ApiService.ContentItem
+import com.zhoujh.aichat.network.ApiService.MultimodalMessage
 
 class TextTestActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTextTestBinding

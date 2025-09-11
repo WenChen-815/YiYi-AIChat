@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fitsSystemWindows="true"
-            android:background="@drawable/gradient_three_colors"
+            android:background="@drawable/bg_gradient_no_radius"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -43,7 +43,7 @@
             android:id="@+id/rvChat"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:paddingHorizontal="8dp"
+            android:padding="8dp"
             android:clipToPadding="false"
             android:scrollbars="vertical"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
@@ -92,7 +92,7 @@
                 android:layout_width="80dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="5dp"
-                android:background="@drawable/blue_round_button"
+                android:background="@drawable/bg_gradient_radius10"
                 app:backgroundTint="@null"
                 android:text="发送"
                 android:textColor="@color/black"
@@ -105,7 +105,7 @@
                 android:layout_width="80dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="5dp"
-                android:background="@drawable/blue_round_button"
+                android:background="@drawable/bg_gradient_radius10"
                 app:backgroundTint="@null"
                 android:text="发图"
                 android:textColor="@color/black"
@@ -117,16 +117,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- 侧边栏抽屉内容 -->
-<!--    <include-->
-<!--        android:id="@+id/navView"-->
-<!--        layout="@layout/activity_chat_drawer" />-->
-    <!-- 侧边栏抽屉内容 - 使用NavigationView -->
-    <com.google.android.material.navigation.NavigationView
+    <include
         android:id="@+id/navView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@android:color/white"
-        app:headerLayout="@layout/activity_chat_drawer_head"
-        app:menu="@menu/activity_chat_drawer_menu" />
+        layout="@layout/activity_chat_drawer" />
 </androidx.drawerlayout.widget.DrawerLayout>

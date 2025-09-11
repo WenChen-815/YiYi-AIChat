@@ -127,6 +127,7 @@ class ApiService(private val baseUrl: String,
         prompt: String,
         imageBase64: String,
         model: String,
+        temperature: Float? = 0.80f,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
@@ -140,7 +141,7 @@ class ApiService(private val baseUrl: String,
         val message = MultimodalMessage("user", contentItems)
         val messages = listOf(message)
 
-        val chatRequest = MultimodalChatRequest(model, messages)
+        val chatRequest = MultimodalChatRequest(model, messages, temperature)
 
         // 使用Gson将请求体对象转换为JSON字符串
         val requestBodyStr = gson.toJson(chatRequest)
@@ -192,7 +193,8 @@ class ApiService(private val baseUrl: String,
     // 定义多模态聊天请求体的数据类
     data class MultimodalChatRequest(
         val model: String,
-        val messages: List<MultimodalMessage>
+        val messages: List<MultimodalMessage>,
+        val temperature: Float? = null
     )
 
     data class MultimodalMessage(

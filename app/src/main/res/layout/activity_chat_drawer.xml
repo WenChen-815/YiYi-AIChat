@@ -1,38 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navView"
-    android:layout_width="240dp"
+    android:layout_width="288dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
-    android:background="#A1F86592"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical"
+    android:background="@drawable/bg_white_0110_radius23"
     tools:context=".ui.activity.ChatActivity">
-    <Button
-        android:id="@+id/btnConfig"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="配置" />
 
-    <Button
-        android:id="@+id/btnShowModels"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="切换模型" />
+    <!-- 顶部渐变背景区域 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/nav_head"
+        android:layout_width="match_parent"
+        android:layout_height="188dp"
+        android:fitsSystemWindows="true"
+        android:background="@drawable/bg_gradient_0100_radius23"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+        <!-- 标题文本 -->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginVertical="6dp"
+            android:paddingStart="16dp"
+            android:text="依依"
+            android:textColor="#000000"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tvCurrentModelName"/>
 
+        <!-- 副标题文本 -->
+        <TextView
+            android:id="@+id/tvCurrentModelName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="6dp"
+            android:paddingStart="16dp"
+            android:text="gemini-2.5-pro"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="@id/tv_title"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 配置菜单项 -->
     <TextView
-        android:id="@+id/tvCurrentModelName"
-        android:layout_width="wrap_content"
+        android:id="@+id/nav_config"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="16dp"
-        android:text="当前模型: " />
+        android:padding="16dp"
+        android:text="配置"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nav_head" />
 
-    <Button
-        android:id="@+id/btnAddCharacter"
-        android:layout_width="wrap_content"
+    <!-- 切换模型菜单项 -->
+    <TextView
+        android:id="@+id/nav_switch_model"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="角色选择" />
-</LinearLayout>
+        android:padding="16dp"
+        android:text="切换模型"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nav_config" />
+
+    <!-- 分隔线1 -->
+    <View
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="#CCCCCC"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nav_switch_model" />
+
+    <!-- 操作菜单项 -->
+    <TextView
+        android:id="@+id/nav_operation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="操作"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider1" />
+
+    <!-- 清空聊天记录菜单项 -->
+    <TextView
+        android:id="@+id/nav_clear_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="清空聊天记录"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nav_operation" />
+
+    <!-- 分隔线2 -->
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="#CCCCCC"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nav_clear_chat" />
+
+    <!-- 更多菜单项 -->
+    <TextView
+        android:id="@+id/nav_more"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="更多"
+        android:textColor="@color/gray"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/divider2" />
+
+    <!-- 关于菜单项 -->
+    <TextView
+        android:id="@+id/nav_about"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="关于"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nav_more" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

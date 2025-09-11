@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
-        android:background="@drawable/gradient_three_colors"
+        android:background="@drawable/bg_gradient_no_radius"
         android:padding="16dp">
 
         <TextView

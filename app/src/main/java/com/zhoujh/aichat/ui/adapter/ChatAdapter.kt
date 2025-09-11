@@ -49,7 +49,7 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
     override fun getItemViewType(position: Int): Int {
         return when(getItem(position).type) {
             MessageType.USER -> VIEW_TYPE_USER
-            MessageType.AI -> VIEW_TYPE_AI
+            MessageType.ASSISTANT -> VIEW_TYPE_AI
             MessageType.SYSTEM -> VIEW_TYPE_SYSTEM
             else -> throw IllegalArgumentException("未知的消息类型")
         }
@@ -147,7 +147,7 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(ChatMessag
         for (message in messages) {
             // 解析AI回复中的日期和角色名称
             var cleanedContent = ChatUtil.parseMessage(message)
-            if (message.type == MessageType.AI && cleanedContent.contains('\\') && message.contentType != MessageContentType.IMAGE && message.contentType != MessageContentType.VOICE) {
+            if (message.type == MessageType.ASSISTANT && cleanedContent.contains('\\') && message.contentType != MessageContentType.IMAGE && message.contentType != MessageContentType.VOICE) {
                 // 分割AI消息内容
                 val parts = cleanedContent.split('\\').filter { it.isNotBlank() }
 

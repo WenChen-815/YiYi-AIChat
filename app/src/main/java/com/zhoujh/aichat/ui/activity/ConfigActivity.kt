@@ -39,6 +39,10 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         setupViews()
         setupListeners()
         binding.btnLoadModels.performClick()
+        // 如果图片识别功能已启用，则自动加载图片识别模型
+        if (configManager.isImgRecognitionEnabled()) {
+            binding.btnLoadImgModels.performClick()
+        }
     }
 
     private fun setupViews() {
@@ -232,6 +236,7 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                         }
                         // 如果有已保存的图片识别模型，选中它
                         configManager.getSelectedImgModel()?.let { savedImgModel ->
+                            Toast.makeText(this@ConfigActivity, "已加载图片识别模型: $savedImgModel", Toast.LENGTH_SHORT).show()
                             val imgPosition = modelList.indexOfFirst { it.id == savedImgModel }
                             if (imgPosition != -1) {
                                 binding.spinnerImgModels.setSelection(imgPosition)
