@@ -16,6 +16,9 @@ class ConfigManager() {
     private val KEY_IMG_BASE_URL = "img_base_url"
     private val KEY_SELECTED_IMG_MODEL = "selected_img_model"
 
+    private val KEY_MAX_CONTEXT_MESSAGE_SIZE = "max_context_message_size"
+    private val KEY_SUMMARIZE_TRIGGER_COUNT = "summarize_trigger_count"
+
     private val prefs: SharedPreferences =
         AppContext.getInstance().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
@@ -135,5 +138,25 @@ class ConfigManager() {
     // 获取选中的图片识别模型
     fun getSelectedImgModel(): String? {
         return prefs.getString(KEY_SELECTED_IMG_MODEL, null)
+    }
+
+    // 保存最大上下文消息数
+    fun saveMaxContextMessageSize(size: Int) {
+        prefs.edit { putInt(KEY_MAX_CONTEXT_MESSAGE_SIZE, size) }
+    }
+
+    // 获取最大上下文消息数
+    fun getMaxContextMessageSize(): Int {
+        return prefs.getInt(KEY_MAX_CONTEXT_MESSAGE_SIZE, 5)
+    }
+
+    // 保存触发总结的对话数
+    fun saveSummarizeTriggerCount(count: Int) {
+        prefs.edit { putInt(KEY_SUMMARIZE_TRIGGER_COUNT, count) }
+    }
+
+    // 获取触发总结的对话数
+    fun getSummarizeTriggerCount(): Int {
+        return prefs.getInt(KEY_SUMMARIZE_TRIGGER_COUNT, 20)
     }
 }

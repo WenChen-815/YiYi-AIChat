@@ -1,22 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true">
-
+    <RelativeLayout
+        android:id="@+id/rl_head"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="API 配置"
+            android:textSize="20sp"
+            android:layout_centerVertical="true"
+            android:textStyle="bold" />
+        <!-- 保存按钮 -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/blue"
+            android:text="保存"
+            android:textColor="@color/white"
+            android:layout_alignParentEnd="true"/>
+    </RelativeLayout>
+    <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rl_head">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="API 配置"
-            android:textSize="20sp"
-            android:textStyle="bold" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -207,15 +228,45 @@
                 android:layout_marginStart="8dp"
                 android:visibility="gone" />
         </LinearLayout>
-
-        <!-- 保存按钮 -->
-        <Button
-            android:id="@+id/btnSave"
+        <!-- 最大上下文条数 -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:backgroundTint="@color/blue"
-            android:text="保存配置"
-            android:textColor="@color/white" />
+            android:layout_marginTop="16dp"
+            android:text="最大上下文条数:"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etContextCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="例如: https://vg.xxxx.cc"
+            android:background="@drawable/bg_edit_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:layout_gravity="center_vertical"
+            android:inputType="number"
+            android:text="5" />
+        <!-- 中转地址输入 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="触发总结对话数:"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etSummarizeCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="例如: https://vg.xxxx.cc"
+            android:background="@drawable/bg_edit_text"
+            android:paddingHorizontal="4dp"
+            android:paddingVertical="8dp"
+            android:layout_gravity="center_vertical"
+            android:inputType="number"
+            android:text="20" />
+
     </LinearLayout>
 </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

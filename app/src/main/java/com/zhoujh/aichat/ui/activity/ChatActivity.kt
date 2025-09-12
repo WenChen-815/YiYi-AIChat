@@ -57,7 +57,6 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
 
     // 常量定义
     private val TAG = "ChatActivity"
-    private var MAX_CONTEXT_MESSAGE_SIZE = 5
     private val REQUEST_CODE_PICK_IMAGE = 1001
 
     // 布局与视图相关变量
@@ -67,7 +66,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
     private lateinit var chatAdapter: ChatAdapter
     private val chatMessages = mutableListOf<ChatMessage>()
     private var chatContext: LimitMutableList<TempChatMessage> =
-        limitMutableListOf<TempChatMessage>(MAX_CONTEXT_MESSAGE_SIZE)
+        limitMutableListOf<TempChatMessage>(5)
 //    private var chatContext = mutableListOf<ChatMessage>()
 
     // 配置与服务相关变量
@@ -131,7 +130,11 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
         // 检查是否有选中的角色
         checkSelectedCharacter()
     }
-
+    override fun onResume() {
+        super.onResume()
+        // 更新最大上下文消息数
+        chatContext.setLimit(configManager.getMaxContextMessageSize())
+    }
     override fun onDestroy() {
         super.onDestroy()
         currentFlowJob?.cancel()
@@ -538,7 +541,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
             val totalCount = chatMessageDao.getTotalMessageCount()
             hasMoreData = totalCount > PAGE_SIZE
 //            Log.d("loadInitialData","initialMessages[ ${chatMessages.map { it -> it.content }}]")
-            tempChatMessageDao.getByCharacterId(currentCharacterId).takeLast(MAX_CONTEXT_MESSAGE_SIZE).let {
+            tempChatMessageDao.getByCharacterId(currentCharacterId).takeLast(configManager.getMaxContextMessageSize()).let {
                 chatContext.addAll(it)
             }
             Log.d(
@@ -686,8 +689,15 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
             .setPositiveButton("确定") { _, _ ->
                 currentAICharacter.aiCharacterId.let {
                     launch(Dispatchers.IO) {
+                        // 删除数据库中的聊天记录
                         chatMessageDao.deleteMessagesByCharacterId(it)
                         tempChatMessageDao.deleteByCharacterId(it)
+
+                        // 删除与该角色相关的聊天图片
+                        val imageManager = ChatImageManager(this@ChatActivity)
+                        val conversationId = "${configManager.getUserId()}_$currentCharacterId"
+                        imageManager.deleteAllImagesForConversation(conversationId)
+
                         mainHandler.post {
                             chatMessages.clear()
                             chatAdapter.setMessages(emptyList())

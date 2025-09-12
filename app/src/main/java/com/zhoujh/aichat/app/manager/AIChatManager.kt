@@ -15,6 +15,7 @@ import com.zhoujh.aichat.network.ApiService
 import com.zhoujh.aichat.network.ApiService.ContentItem
 import com.zhoujh.aichat.network.ApiService.MultimodalMessage
 import com.zhoujh.aichat.utils.ChatUtil
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,11 +34,14 @@ object AIChatManager {
     private lateinit var configManager: ConfigManager
     private lateinit var apiKey: String
     private lateinit var baseUrl: String
-    private lateinit var selectedModel: String
+//    private lateinit var selectedModel: String
     // 获取图片识别相关配置
     private var imgApiKey: String? = null
     private var imgBaseUrl: String? = null
     private var selectedImgModel: String? = null
+
+    private var maxContextMessageSize: Int = 5
+    private var summarizeTriggerCount: Int = 20
 
     private val chatMessageDao = AppContext.appDatabase.chatMessageDao()
     private val tempChatMessageDao = AppContext.appDatabase.tempChatMessageDao()
@@ -46,9 +50,6 @@ object AIChatManager {
 
     // 为每个AICharacter维护一个独立的锁对象
     private val characterLocks = ConcurrentHashMap<String, Mutex>()
-    // 为每个AICharacter维护一个总结任务的防抖标记
-    private val characterSummarizeCooldown = ConcurrentHashMap<String, Long>()
-    private val SUMMARIZE_COOLDOWN_TIME = 5000L // 5秒防抖时间
     private var USER_ID = "123123";
     private var USER_NAME = "USER_NAME"
 
@@ -56,13 +57,17 @@ object AIChatManager {
         configManager = ConfigManager()
         apiKey = configManager.getApiKey() ?: ""
         baseUrl = configManager.getBaseUrl() ?: ""
-        selectedModel = configManager.getSelectedModel() ?: ""
+//        selectedModel = configManager.getSelectedModel() ?: ""
         imgApiKey = configManager.getImgApiKey()
         imgBaseUrl = configManager.getImgBaseUrl()
         selectedImgModel = configManager.getSelectedImgModel()
         apiService = ApiService(baseUrl, apiKey, imgBaseUrl, imgApiKey)
+
         USER_ID = configManager.getUserId().toString()
         USER_NAME = configManager.getUserName().toString()
+
+        maxContextMessageSize = configManager.getMaxContextMessageSize()
+        summarizeTriggerCount = configManager.getSummarizeTriggerCount()
     }
 
     // 注册监听器
@@ -138,8 +143,8 @@ object AIChatManager {
             )
         }
         Log.i(TAG, "用户 调用总结")
-        summarize(aiCharacter)
         send(aiCharacter, messages)
+        summarize(aiCharacter)
     }
 
     private fun send(
@@ -153,7 +158,7 @@ object AIChatManager {
         // 这里调用网络API发送消息
         apiService.sendMessage(
             messages = messages,
-            model = selectedModel,
+            model = configManager.getSelectedModel() ?: "",
             temperature = 1.1f,
             onSuccess = { aiResponse ->
                 // 收到回复
@@ -209,27 +214,19 @@ object AIChatManager {
             return
         }
 
-        // 检查防抖
         val characterId = aiCharacter.aiCharacterId
-        val currentTime = System.currentTimeMillis()
-        val lastSummarizeTime = characterSummarizeCooldown[characterId] ?: 0L
-        if (currentTime - lastSummarizeTime < SUMMARIZE_COOLDOWN_TIME) {
-            Log.d(TAG, "总结被防抖拦截，距离上次总结时间: ${currentTime - lastSummarizeTime}ms")
-            return
-        }
-
         // 获取该角色对应的锁，如果不存在则创建一个新的锁
         val characterLock = characterLocks.computeIfAbsent(characterId) { Mutex() }
         // 尝试获取角色锁，如果已被锁定则等待
         characterLock.withLock {
             val count = tempChatMessageDao.getCountByCharacterId(aiCharacter.aiCharacterId)
-            if (count < 10) {
+            if (count < summarizeTriggerCount) {
                 Log.d(TAG, "总结个蛋 count=$count")
                 return@withLock
             }
             Log.d(TAG, "summarize: 开始总结 count=$count")
             val allHistory = tempChatMessageDao.getByCharacterId(aiCharacter.aiCharacterId)
-            val summaryMessages = allHistory.subList(0, allHistory.size - 5)
+            val summaryMessages = allHistory.subList(0, allHistory.size - maxContextMessageSize)
             // 构建消息列表
             val messages = mutableListOf<Message>()
             // 添加系统提示消息
@@ -251,9 +248,11 @@ object AIChatManager {
                 summaryRequest += "\n${message.content}"
             }
             messages.add(Message("system", summaryRequest))
+            // 使用CompletableDeferred来等待API调用完成
+            val apiCompleted = CompletableDeferred<Boolean>()
             apiService.sendMessage(
                 messages = messages,
-                model = selectedModel,
+                model = configManager.getSelectedModel() ?: "",
                 temperature = 0.3f,
                 onSuccess = { aiResponse ->
                     // 收到回复
@@ -279,13 +278,17 @@ object AIChatManager {
                         }
                         aiChatMemoryDao.update(aiMemory)
                         callback?.invoke()
+                        apiCompleted.complete(true)
                     }
                 },
                 onError = {
                     // 发生错误
                     Log.e(TAG, "summarize: 总结失败")
+                    apiCompleted.complete(false)
                 }
             )
+            // 等待API调用完成后再释放锁
+            apiCompleted.await()
         }
     }
 
@@ -365,7 +368,7 @@ object AIChatManager {
     // 将Bitmap转换为Base64字符串
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos) // 压缩图片质量为80%
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos) // 压缩图片质量为100%
         val bytes = baos.toByteArray()
         return android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
     }

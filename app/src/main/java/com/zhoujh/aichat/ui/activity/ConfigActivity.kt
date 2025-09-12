@@ -11,6 +11,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import com.zhoujh.aichat.app.manager.AIChatManager
 import com.zhoujh.aichat.databinding.ActivityConfigBinding
 import com.zhoujh.aichat.network.model.Model
 import com.zhoujh.aichat.network.ApiService
@@ -65,6 +66,9 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         configManager.getImgBaseUrl()?.let {
             binding.etImgBaseUrl.setText(it)
         }
+
+        binding.etContextCount.setText(configManager.getMaxContextMessageSize().toString())
+        binding.etSummarizeCount.setText(configManager.getSummarizeTriggerCount().toString())
     }
 
     private fun setupListeners() {
@@ -119,6 +123,9 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             val imgBaseUrl = binding.etImgBaseUrl.text.toString().trim()
             val selectedImgModelPosition = binding.spinnerImgModels.selectedItemPosition
 
+            val contextCount = binding.etContextCount.text.toString().toIntOrNull() ?: 5
+            val summarizeCount = binding.etSummarizeCount.text.toString().toIntOrNull() ?: 20
+
             if (apiKey.isEmpty() || baseUrl.isEmpty()) {
                 Toast.makeText(this, "请填写完整的API Key和中转地址", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -158,12 +165,15 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                 }
             }
 
-            Toast.makeText(this, "配置保存成功", Toast.LENGTH_SHORT).show()
+            configManager.saveMaxContextMessageSize(contextCount)
+            configManager.saveSummarizeTriggerCount(summarizeCount)
 
+            Toast.makeText(this, "配置保存成功", Toast.LENGTH_SHORT).show()
+            AIChatManager.init()
             // 返回主界面
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            startActivity(intent)
+//            val intent = Intent(this, MainActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//            startActivity(intent)
             finish()
         }
     }
@@ -226,28 +236,29 @@ class ConfigActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                         } else {
                             binding.spinnerImgModels.adapter = adapter
                         }
-
-                        // 如果有已保存的模型，选中它
-                        configManager.getSelectedModel()?.let { savedModel ->
-                            val position = modelList.indexOfFirst { it.id == savedModel }
-                            if (position != -1) {
-                                binding.spinnerModels.setSelection(position)
+                        if (type == 0){
+                            // 如果有已保存的模型，选中它
+                            configManager.getSelectedModel()?.let { savedModel ->
+                                val position = modelList.indexOfFirst { it.id == savedModel }
+                                if (position != -1) {
+                                    binding.spinnerModels.setSelection(position)
+                                }
+                            }
+                        } else {
+                            // 如果有已保存的图片识别模型，选中它
+                            configManager.getSelectedImgModel()?.let { savedImgModel ->
+                                val imgPosition = modelList.indexOfFirst { it.id == savedImgModel }
+                                if (imgPosition != -1) {
+                                    binding.spinnerImgModels.setSelection(imgPosition)
+                                }
                             }
                         }
-                        // 如果有已保存的图片识别模型，选中它
-                        configManager.getSelectedImgModel()?.let { savedImgModel ->
-                            Toast.makeText(this@ConfigActivity, "已加载图片识别模型: $savedImgModel", Toast.LENGTH_SHORT).show()
-                            val imgPosition = modelList.indexOfFirst { it.id == savedImgModel }
-                            if (imgPosition != -1) {
-                                binding.spinnerImgModels.setSelection(imgPosition)
-                            }
-                        }
 
-                        Toast.makeText(
-                            this@ConfigActivity,
-                            "成功加载${modelList.size}个模型",
-                            Toast.LENGTH_SHORT
-                        ).show()
+//                        Toast.makeText(
+//                            this@ConfigActivity,
+//                            "成功加载${modelList.size}个模型",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
                     }
                 },
                 onError = { errorMsg ->
