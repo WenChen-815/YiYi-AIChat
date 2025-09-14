@@ -3,7 +3,7 @@ package com.zhoujh.aichat.app.manager
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.app.App
 
 class ConfigManager() {
     private val PREF_NAME = "ai_chat_config"
@@ -20,7 +20,7 @@ class ConfigManager() {
     private val KEY_SUMMARIZE_TRIGGER_COUNT = "summarize_trigger_count"
 
     private val prefs: SharedPreferences =
-        AppContext.getInstance().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        App.instance.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
     // 保存API Key
     fun saveApiKey(apiKey: String) {

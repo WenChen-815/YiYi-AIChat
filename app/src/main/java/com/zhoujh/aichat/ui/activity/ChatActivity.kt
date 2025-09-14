@@ -10,16 +10,13 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -27,10 +24,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
-import com.zhoujh.aichat.app.AppContext
 import com.zhoujh.aichat.R
+import com.zhoujh.aichat.app.App
 import com.zhoujh.aichat.ui.adapter.ChatAdapter
 import com.zhoujh.aichat.databinding.ActivityChatBinding
 import com.zhoujh.aichat.database.entity.AICharacter
@@ -79,8 +75,8 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
     private lateinit var aIChatMessageListener: AIChatMessageListener
 
     // 数据库相关变量
-    private val chatMessageDao = AppContext.appDatabase.chatMessageDao()
-    private val tempChatMessageDao = AppContext.appDatabase.tempChatMessageDao()
+    private val chatMessageDao = App.appDatabase.chatMessageDao()
+    private val tempChatMessageDao = App.appDatabase.tempChatMessageDao()
 
     // 协程与任务相关变量
     private var currentFlowJob: Job? = null
@@ -151,7 +147,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
                 launch(Dispatchers.IO) {
                     // 从数据库加载角色信息
                     currentAICharacter =
-                        AppContext.appDatabase.aiCharacterDao().getCharacterById(characterId)!!
+                        App.appDatabase.aiCharacterDao().getCharacterById(characterId)!!
                     currentCharacterId = characterId
                     currentCharacterName = currentAICharacter.name
                     mainHandler.post {
@@ -491,7 +487,7 @@ class ChatActivity : AppCompatActivity(), CoroutineScope by MainScope(){
         var characterId = configManager.getSelectedCharacterId() ?: ""
         if (characterId.isNotEmpty()) {
             launch(Dispatchers.IO) {
-                AppContext.appDatabase.aiCharacterDao().getCharacterById(characterId)
+                App.appDatabase.aiCharacterDao().getCharacterById(characterId)
                     ?.let { character ->
                         currentAICharacter = character
                         currentCharacterId = character.aiCharacterId

@@ -3,7 +3,7 @@ package com.zhoujh.aichat.app.manager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
-import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.app.App
 import com.zhoujh.aichat.database.entity.AICharacter
 import com.zhoujh.aichat.database.entity.AIChatMemory
 import com.zhoujh.aichat.database.entity.ChatMessage
@@ -12,8 +12,6 @@ import com.zhoujh.aichat.network.model.Message
 import com.zhoujh.aichat.database.entity.MessageType
 import com.zhoujh.aichat.database.entity.TempChatMessage
 import com.zhoujh.aichat.network.ApiService
-import com.zhoujh.aichat.network.ApiService.ContentItem
-import com.zhoujh.aichat.network.ApiService.MultimodalMessage
 import com.zhoujh.aichat.utils.ChatUtil
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -43,9 +41,9 @@ object AIChatManager {
     private var maxContextMessageSize: Int = 5
     private var summarizeTriggerCount: Int = 20
 
-    private val chatMessageDao = AppContext.appDatabase.chatMessageDao()
-    private val tempChatMessageDao = AppContext.appDatabase.tempChatMessageDao()
-    private val aiChatMemoryDao = AppContext.appDatabase.aiChatMemoryDao()
+    private val chatMessageDao = App.appDatabase.chatMessageDao()
+    private val tempChatMessageDao = App.appDatabase.tempChatMessageDao()
+    private val aiChatMemoryDao = App.appDatabase.aiChatMemoryDao()
     private lateinit var apiService: ApiService
 
     // 为每个AICharacter维护一个独立的锁对象

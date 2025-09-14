@@ -1,13 +1,13 @@
 package com.zhoujh.aichat.utils
 
-import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.app.App
 import java.io.File
 import java.io.FileWriter
 
 object FilesUtil {
-    val context: AppContext? = AppContext.getInstance()
+    val app: App = App.instance
     fun appendToFile(message: String, fileName: String) {
-        var file = File(context?.filesDir, fileName)
+        var file = File(app.applicationContext?.filesDir, fileName)
         // 确保父目录存在，如果不存在则逐级创建
         file.parentFile?.also { parent ->
             if (!parent.exists()) {
@@ -31,7 +31,7 @@ object FilesUtil {
 
     // 读取文件所有内容
     fun readFile(fileName: String): String {
-        var file = File(context?.filesDir, fileName)
+        var file = File(app.applicationContext?.filesDir, fileName)
         if (!file.exists()) {
             return ""
         }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.zhoujh.aichat.databinding.FragmentProfileBinding
+import com.zhoujh.aichat.ui.activity.ComposeTestActivity
 import com.zhoujh.aichat.ui.activity.ConfigActivity
 import com.zhoujh.aichat.ui.activity.ImgTestActivity
 import com.zhoujh.aichat.ui.activity.TextTestActivity
@@ -29,6 +30,9 @@ class ProfileFragment : Fragment() {
         }
         binding.btnImgTest.setOnClickListener {
             startActivity(Intent(requireContext(), ImgTestActivity::class.java))
+        }
+        binding.btnComposeTest.setOnClickListener {
+            startActivity(Intent(requireContext(), ComposeTestActivity::class.java))
         }
         return binding.root
     }

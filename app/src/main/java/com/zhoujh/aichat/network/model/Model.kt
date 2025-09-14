@@ -13,7 +13,7 @@ data class Model(
     val `object`: String,
     val created: Long,
     val owned_by: String,
-    val permission: List<Permission>,
+    val permission: List<Permission>?,
     val root: String?,
     val parent: String?
 )

@@ -2,7 +2,7 @@ package com.zhoujh.aichat.database.repository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.app.App
 
 
 class AICharacterRepository {
@@ -28,9 +28,9 @@ class AICharacterRepository {
         )
     ) {
         if (query != null) {
-            AppContext.appDatabase.aiCharacterDao().getCharacterByNamePagingSource(query)
+            App.appDatabase.aiCharacterDao().getCharacterByNamePagingSource(query)
         } else {
-            AppContext.appDatabase.aiCharacterDao().getAllCharactersPagingSource()
+            App.appDatabase.aiCharacterDao().getAllCharactersPagingSource()
         }
 
     }.flow

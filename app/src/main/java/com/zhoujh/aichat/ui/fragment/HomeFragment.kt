@@ -19,7 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.app.App
 import com.zhoujh.aichat.ui.adapter.CharacterAdapter
 import com.zhoujh.aichat.database.dao.AICharacterDao
 import com.zhoujh.aichat.databinding.FragmentHomeBinding
@@ -47,7 +47,7 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        aiCharacterDao = AppContext.appDatabase.aiCharacterDao()
+        aiCharacterDao = App.appDatabase.aiCharacterDao()
 
         // 初始化ViewModel
         viewModel = ViewModelProvider(this)[CharacterViewModel::class.java]

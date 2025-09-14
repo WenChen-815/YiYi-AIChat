@@ -5,7 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.zhoujh.aichat.app.AppContext
+import com.zhoujh.aichat.app.App
 import com.zhoujh.aichat.app.manager.ConfigManager
 import com.zhoujh.aichat.databinding.ActivityCharacterEditBinding
 import com.zhoujh.aichat.database.entity.AICharacter
@@ -22,8 +22,8 @@ class CharacterEditActivity : AppCompatActivity(), CoroutineScope by MainScope()
     private lateinit var binding: ActivityCharacterEditBinding
     private lateinit var viewModel: CharacterViewModel
     private var characterId: String? = null
-    private var aiCharacterDao = AppContext.appDatabase.aiCharacterDao()
-    private var aiChatMemoryDao = AppContext.appDatabase.aiChatMemoryDao()
+    private var aiCharacterDao = App.appDatabase.aiCharacterDao()
+    private var aiChatMemoryDao = App.appDatabase.aiChatMemoryDao()
     private val userId = ConfigManager().getUserId().toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {

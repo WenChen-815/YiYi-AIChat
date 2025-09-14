@@ -11,7 +11,7 @@
         android:maxSdkVersion="32" />
 
     <application
-        android:name=".app.AppContext"
+        android:name=".app.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -49,6 +49,9 @@
             android:name=".ui.activity.ChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
+        <activity
+            android:name=".ui.activity.ComposeTestActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

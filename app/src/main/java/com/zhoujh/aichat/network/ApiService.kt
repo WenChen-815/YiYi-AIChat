@@ -16,6 +16,7 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class ApiService(private val baseUrl: String,
                  private val apiKey: String,
@@ -26,7 +27,7 @@ class ApiService(private val baseUrl: String,
     private val tag = "ApiService"
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
         .build()
     private val gson = Gson()
@@ -104,10 +105,11 @@ class ApiService(private val baseUrl: String,
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string() ?: ""
+                Log.e(tag,responseBody)
                 if (response.isSuccessful) {
                     try {
                         val modelsResponse = gson.fromJson(responseBody, ModelsResponse::class.java)
-                        if (modelsResponse.success) {
+                        if (modelsResponse.success || modelsResponse.`object`== "list") {
                             onSuccess(modelsResponse.data)
                         } else {
                             onError("获取模型列表失败：接口返回不成功")
